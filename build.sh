@@ -22,19 +22,25 @@ image="${MARP_IMAGE:-docker.io/marpteam/marp-cli:v4.3.1}"
 # テーマの解決をスクリプトの置き場所基準にするため, スクリプト自身のディレクトリを取得する.
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+if ! podman info > /dev/null 2>&1; then
+  echo "error: podman が利用できません. インストールと設定を確認してください." >&2
+  exit 1
+fi
+
 # 入力ファイルのディレクトリとテーマディレクトリをコンテナにマウントして marp-cli を実行する.
 run_marp() {
   # --userns=keep-id: rootless Podman でホストの UID をコンテナ内に引き継ぐ.
   # --allow-local-files 使用時に marp-cli が出す WARN をフィルタする.
   # 出力をバッファして podman のエラーコードを正しく伝播する.
-  local output
+  local output rc
   output=$(podman run --rm --init \
     --userns=keep-id \
+    --network=none \
     -v "$dir:/home/marp/app" \
     -v "$script_dir/themes:/home/marp/themes:ro" \
     -e "LANG=${LANG:-C.UTF-8}" \
     -e "MARP_USER=$(id -u):$(id -g)" \
-    "$image" "$@" 2>&1) || return $?
+    "$image" "$@" 2>&1) || { rc=$?; printf '%s\n' "$output" >&2; return $rc; }
   printf '%s\n' "$output" | grep -Ev '\[  WARN \] Insecure local file|^ +\S+\.md\.$' >&2 || true
 }
 
@@ -58,6 +64,7 @@ run_marp "$file" --theme-set /home/marp/themes/modern.css \
 # img2pdf をコンテナ内で実行する. ページサイズ 2880pt × 1620pt = 4K キャンバスの 0.75 倍.
 podman run --rm --init \
   --userns=keep-id \
+  --network=host \
   -e HOME=/tmp \
   -v "$dir/out:/out" \
   docker.io/python:3-slim \

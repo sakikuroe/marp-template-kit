@@ -43,7 +43,6 @@ theme: modern
 
 - `out/sample.html` — HTML
 - `out/sample.pdf` — PDF (`backdrop-filter` 対応, PNG 経由で変換)
-- `out/sample.marp.pdf` — PDF (軽量版, `backdrop-filter` は描画されない)
 
 ### 使用イメージの変更
 
