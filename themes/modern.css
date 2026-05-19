@@ -410,7 +410,7 @@ section>.thm,
 section>.cor,
 section>.ex,
 section>.proof,
-section>.cards {
+section>.cols {
   font-size: calc(var(--body-scale) * 1em);
 }
 
@@ -687,26 +687,19 @@ section.section>p {
   margin-bottom: 18px;
 }
 
-/* ===== 多カラムレイアウト (.cols / .cards) ===== */
-/* .cols と .cards は等幅グリッドを共通ベースとする.
-   .cols: 素の多カラムグリッド (画像・テキストなど任意の内容を並べる).
-   .cards: カードスタイルの多カラムグリッド.
-   いずれも grid-template-columns を上書きすると列の比率を変えられる.
+/* ===== カラムレイアウト (.cols) ===== */
+/* 列レイアウトの汎用グリッドコンテナ.
+   テキスト・画像・カードなど内容の種類を問わず使用できる.
+   grid-template-columns を上書きすると列の比率を変えられる.
    例: style="grid-template-columns: 1fr 2fr" */
-
-.cols,
-.cards {
+.cols {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 72px;
+  align-items: stretch;
 }
 
-/* .cols: 画像とテキストの組み合わせなど, 各列を中央揃えで配置する. */
-.cols {
-  align-items: center;
-}
-
-/* .cols 内の画像はグリッド列幅いっぱいに引き伸ばす.
+/* 画像は列幅いっぱいに自動的に収まるようにする.
    height: auto でアスペクト比を維持し, display: block で余白を除去する. */
 .cols img {
   width: 100%;
@@ -714,13 +707,8 @@ section.section>p {
   display: block;
 }
 
-/* .cards: 全カードの高さを揃える. */
-.cards {
-  align-items: stretch;
-}
-
-/* 個別カード: 上辺をアクセント色で強調し, 側面・下辺は薄いボーダーで囲む.
-   カード見出しは **太字** または先頭の平文段落で表現する.
+/* .card: 上辺をアクセント色で強調するセルスタイル.
+   <div class="card"> をセルに使うとカード装飾が付く.
    フォントサイズは <style scoped> section { --body-scale: 0.72; } </style> で調整する. */
 .card {
   border-top: 12px solid var(--accent);
@@ -750,7 +738,7 @@ section.section>p {
   margin-top: 24px;
 }
 
-/* .col: .cards の中で .card の代わりに使うシンプルな列クラス.
+/* .col: 比較・強調用のシンプルな列スタイル.
    --col-color に色を渡すと, 上辺のボーダーと背景色に反映される. */
 .col {
   padding: 60px 80px;

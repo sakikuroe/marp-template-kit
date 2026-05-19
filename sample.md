@@ -26,10 +26,9 @@ September 1, 2025
 05. 表 (Table) の作成
 06. 専門的なコンテンツ
 07. 定理環境
-08. カードレイアウト
+08. カラムレイアウト
 09. 参考文献
-10. 新レイアウトのサンプル
-11. おわりに
+10. おわりに
 
 ---
 
@@ -70,13 +69,13 @@ BASIC CONTENT
 
 ### h3: 小見出し
 
-#### h4: より小さい見出し
+#### h4: h3 と同サイズ
 
-##### h5: さらに小さい見出し
+##### h5: h3 と同サイズ
 
-###### h6: 最小の見出し
+###### h6: h3 と同サイズ
 
-通常の本文テキストです。見出しと比較してください。
+通常の本文テキストです。このテーマでは h3〜h6 はすべて同じサイズです。
 
 ---
 
@@ -412,21 +411,76 @@ $f(x) = x^2 - 2$ は $[0,\,2]$ 上で連続で $f(0) = -2 < 0$、$f(2) = 2 > 0$ 
 
 # 08
 
-## 複数の情報を横並びに整理する
+## テキスト・画像・カードを横並びに整理する
 
-### カードレイアウト
+### カラムレイアウト
 
-CARD LAYOUT
+COLUMN LAYOUTS
 
 ---
 
-## カードレイアウト: 3 カラム
+## カラムレイアウト: テキスト 2 カラム
+
+<style scoped>
+section { --body-scale: 0.8; }
+</style>
+
+`.cols` はテキスト・画像・カードを問わず, 横並びに配置する汎用グリッドです。
+
+<div class="cols">
+<div>
+
+メリット
+
+- 視覚的な整理がしやすい
+- 比較・対照に適している
+- 情報の階層が明確になる
+
+</div>
+<div>
+
+活用場面
+
+- 選択肢の比較
+- 手順の並列提示
+- 機能・特徴の列挙
+
+</div>
+</div>
+
+---
+
+## カラムレイアウト: 画像と本文
+
+`.cols` に画像と本文を並べる例です。`style="grid-template-columns: 1fr 2fr"` で比率を変えられます。
+
+<div class="cols">
+<div>
+
+![](assets/mandelbrot.png)
+
+</div>
+<div>
+
+画像はグリッド列幅に自動的に収まります。
+
+- 画像・テキスト・リストなど任意の内容を並べられます
+- セルごとに内容の種類が違っても構いません
+
+</div>
+</div>
+
+---
+
+## カラムレイアウト: カードスタイル 3 カラム
 
 <style scoped>
 section { --body-scale: 0.72; }
 </style>
 
-<div class="cards">
+子要素に `.card` クラスを付けると, 上辺のアクセントラインとシャドウが付きます。
+
+<div class="cols">
 <div class="card">
 
 **グリッドシステム**
@@ -452,42 +506,13 @@ section { --body-scale: 0.72; }
 
 ---
 
-## カードレイアウト: 2 カラム（箇条書き）
-
-<style scoped>
-section { --body-scale: 0.8; }
-</style>
-
-<div class="cards">
-<div class="card">
-
-メリット
-
-- 視覚的な整理がしやすい
-- 比較・対照に適している
-- 情報の階層が明確になる
-
-</div>
-<div class="card">
-
-活用場面
-
-- 選択肢の比較
-- 手順の並列提示
-- 機能・特徴の列挙
-
-</div>
-</div>
-
----
-
-## カードレイアウト: 4 カラム
+## カラムレイアウト: カードスタイル 4 カラム
 
 <style scoped>
 section { --body-scale: 0.65; }
 </style>
 
-<div class="cards">
+<div class="cols">
 <div class="card">
 
 Step 1
@@ -520,65 +545,15 @@ Step 4
 
 ---
 
-<!-- _class: section -->
-
-# 09
-
-## 引用・出典の一覧
-
-### 参考文献
-
-REFERENCES
-
----
-
-## 参考文献
-
-- 著者名, 「タイトル」, 出版社, 年.
-- 著者名, 「タイトル」, 学会誌名, vol. X, no. Y, pp. Z–ZZ, 年.
-- 著者名, "Title," *Journal Name*, vol. X, no. Y, pp. Z–ZZ, Year.
-
----
-
-<!-- _class: section -->
-
-# 10
-
-## 新レイアウトのサンプル
-
-### 新レイアウト
-
-NEW LAYOUTS
-
----
-
-## 画像と本文の組み合わせ
-
-<div class="cols">
-<div>
-
-![](assets/mandelbrot.png)
-
-</div>
-<div>
-
-`.cols` で 2 カラムに分割したレイアウトです。
-
-- 画像・テキスト・リストなど任意の内容を並べられます
-- `style="grid-template-columns: 1fr 2fr"` で比率を変えられます
-
-</div>
-</div>
-
----
-
-## 比較
+## カラムレイアウト: 比較
 
 <style scoped>
 .col:last-child { --col-color: var(--accent); }
 </style>
 
-<div class="cards">
+子要素に `.col` クラスを付けると, `--col-color` で上辺の色と背景色を変えられます。
+
+<div class="cols">
 <div class="col">
 
 **従来の方法**
@@ -605,7 +580,27 @@ NEW LAYOUTS
 
 <!-- _class: section -->
 
-# 11
+# 09
+
+## 引用・出典の一覧
+
+### 参考文献
+
+REFERENCES
+
+---
+
+## 参考文献
+
+- 著者名, 「タイトル」, 出版社, 年.
+- 著者名, 「タイトル」, 学会誌名, vol. X, no. Y, pp. Z–ZZ, 年.
+- 著者名, "Title," *Journal Name*, vol. X, no. Y, pp. Z–ZZ, Year.
+
+---
+
+<!-- _class: section -->
+
+# 10
 
 ## ご清聴ありがとうございました
 
