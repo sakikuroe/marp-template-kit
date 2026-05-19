@@ -11,10 +11,46 @@
    ビルド時 (PDF 変換時) はコンテナがインターネットに接続してフォントを取得する. */
 @import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Kosugi&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&display=swap');
 
+/* ===== CSS 変数 ===== */
+/* テーマ全体で参照するカスタムプロパティをここに集約して定義する.
+   調整頻度の高い値を一覧できるため, カスタマイズの起点として活用できる. */
+section {
+  /* --- キャンバス定数 --- */
+  /* --marpit-root-font-size: Marp のルートフォントサイズ. font-size と同値に設定する. */
+  --marpit-root-font-size: 87px;
+  /* 左帯の幅 (3x キャンバス基準, 視覚 約29px). コンテンツ領域は padding-left: 270px で帯と重ならない. */
+  --rail-width: 88px;
+  /* section pre とカードで共有するシャドウ. */
+  --card-shadow:
+    0 1px 1px hsl(225 28% 18% / 0.05),
+    0 3px 6px -2px hsl(225 30% 24% / 0.07),
+    0 10px 18px -6px hsl(225 34% 34% / 0.075),
+    0 28px 48px -18px hsl(225 52% 42% / 0.10);
+
+  /* --- 背景定数 --- */
+  /* グリッド線の色. 不透明な固定色を使うことで, 2 層のグラデーションが交差点で重なっても
+     色が濃くなる問題を回避している. */
+  --grid-line: rgb(240, 240, 240);
+
+  /* --- カラーパレット --- */
+  --text: #181410;
+  --primary: #2e2820;
+  --accent: #d2493a;
+  --link: #4a7a96;
+  --decoration-shadow: drop-shadow(12px 10px 2px rgba(0, 0, 0, 0.09));
+  --rail-divider: rgba(24, 20, 16, 0.45);
+
+  /* --- 本文スケーリング ---
+     使い方: スライド内に <style scoped> section { --body-scale: 0.8; } </style> と書くと
+     見出し以外の本文全体を 0.8 倍にできる. デフォルトは 1 (等倍). */
+  --body-scale: 1;
+}
+
+/* ===== キャンバス ===== */
 /* スライドキャンバスを 4K (3840x2160 = 標準の 3 倍) に拡大する.
    Chromium は border-width を整数 px に切り捨てるため CSS 上の 1.5px を表現できない.
    キャンバスを 3 倍にして 5px/3px で描画し, 33% 縮小表示時に視覚上 約1.67px/1px に見せる.
-   font-size・padding・--marpit-root-font-size も 3 倍にしてレイアウト比率を維持する.
+   font-size・padding も 3 倍にしてレイアウト比率を維持する.
    すべてのスライドのフォントを Zen Kaku Gothic New に設定する.
    フォントが読み込めなかった場合のフォールバックとして sans-serif を指定している. */
 section {
@@ -24,20 +60,167 @@ section {
   font-size: 87px;
   padding: 235.5px;
   padding-left: 270px;
-  --marpit-root-font-size: 87px;
-
-  /* 左帯の幅 (3x キャンバス基準, 視覚 約29px).
-     コンテンツ領域は既存 padding-left: 270px で帯と重ならない. */
-  --rail-width: 88px;
-
   position: relative;
+  color: var(--text);
+}
 
-  /* 共通シャドウ変数. section pre とカードで使用する. */
-  --card-shadow:
-    0 1px 1px hsl(225 28% 18% / 0.05),
-    0 3px 6px -2px hsl(225 30% 24% / 0.07),
-    0 10px 18px -6px hsl(225 34% 34% / 0.075),
-    0 28px 48px -18px hsl(225 52% 42% / 0.10);
+/* ===== 背景・グリッド ===== */
+/* 全スライドに 5mm 方眼紙パターンの背景を設定する.
+   キャンバスが 3x (3840x2160) のため background-size を 74px にして
+   33% 縮小表示時に視覚上 約25px のマス目に見せる.
+   background-image の 2 層がそれぞれ横方向・縦方向の線を描く.
+   縦横同じ値を指定することで上下左右を完全に対称にしている.
+   グリッド線幅 3px = 視覚 1px (3x キャンバス). */
+section {
+  background-color: #fcfcfc;
+  background-image:
+    /* 帯の右端から薄くなる影 (stop 値は 3x キャンバス基準) */
+    linear-gradient(90deg,
+      transparent var(--rail-width),
+      rgba(0, 0, 0, 0.20) calc(var(--rail-width) + 3px),
+      rgba(0, 0, 0, 0.10) calc(var(--rail-width) + 10px),
+      rgba(0, 0, 0, 0.05) calc(var(--rail-width) + 20px),
+      rgba(0, 0, 0, 0.03) calc(var(--rail-width) + 30px),
+      transparent calc(var(--rail-width) + 40px)),
+    linear-gradient(var(--grid-line) 3px, transparent 3px),
+    linear-gradient(90deg, var(--grid-line) 3px, transparent 3px);
+  background-size: 100% 100%, 74px 74px, 74px 74px;
+  background-position: 0 0, 70px 44px, 70px 44px;
+}
+
+/* ===== 帯 ===== */
+/* 帯本体: 左端に半透明のすりガラスを置く. 区切り線をページ番号の上に描く. */
+section::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--rail-width);
+  height: 100%;
+  background:
+    linear-gradient(var(--rail-divider), var(--rail-divider)) center bottom 120px / 80% 3px no-repeat,
+    rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
+/* ===== ヘッダー・フッター・ページ番号 ===== */
+/* default テーマの header・footer は font-size/left/top/bottom が 1x 基準の px で
+   ハードコードされているため, 3x キャンバスに合わせて 3 倍にオーバーライドする.
+   (default: font-size 18px, left 30px, top/bottom 21px → 各 3 倍) */
+section header,
+section footer {
+  font-size: 54px;
+  left: 90px;
+}
+
+/* スライドタイトルを帯内に 90° 反時計回りで表示 (6時→12時方向).
+   要素を横長 (width=縦スパン, height=フォント高) に置き,
+   底辺左端を軸に rotate(-90deg) することで帯内に収める.
+   left = 帯中央 + 行高の半分 = calc(var(--rail-width) / 2 + 0.5lh) で厳密に中央揃え. */
+section header {
+  left: calc(var(--rail-width) / 2 + 0.5lh);
+  bottom: 166px;
+  right: auto;
+  top: auto;
+  width: 1900px;
+  font-size: 36px;
+  font-weight: normal;
+  white-space: nowrap;
+  text-align: left;
+  transform-origin: 0 100%;
+  transform: rotate(-90deg);
+  z-index: 1;
+}
+
+section footer {
+  bottom: 63px;
+  left: 270px;
+}
+
+/* ページ番号を帯 (--rail-width) の水平中央・下部に配置する. */
+section::after {
+  font-size: 45px;
+  left: 0;
+  right: auto;
+  width: var(--rail-width);
+  bottom: 23px;
+  text-align: center;
+}
+
+/* ===== タイポグラフィ ===== */
+
+/* リンクはアクセントに近い青系で本文と区別する. */
+section a {
+  color: var(--link);
+}
+
+/* h1 はスライドタイトルや大見出しに使う. --primary (濃い茶黒) で本文より重みを持たせる. */
+section h1 {
+  color: var(--primary);
+}
+
+/* h2 見出しを左上に固定する.
+   section は block レイアウトのため, default テーマが h2 に付与する
+   margin-top: var(--base-size-24) (= 130px) などの影響でスライドごとに位置がずれる.
+   position: absolute で section の padding-top/left 位置に固定し, ずれをなくす.
+   :has(> h2) でコンテンツの開始位置を h2 の高さ分だけ下げる.
+     h2 高さ ≈ 141px (line-height) + 34px (padding-bottom) = 175px
+     padding-top = 235.5 (section 元値) + 175 (h2) + 87 (gap) = 約 500px */
+section:has(> h2) {
+  padding-top: 500px;
+}
+
+/* 見出しの左に縦長の長方形装飾を付ける.
+   白地・黒枠の矩形を ::before で描き, シェブロンと同じ drop-shadow を適用する.
+   width: 0.32em, height: 0.92em でキャップハイトに近い高さを設定する.
+   border: 5px (視覚 約1.67px). */
+section>h2 {
+  position: absolute;
+  top: 235.5px;
+  left: 270px;
+  right: 235.5px;
+  padding-left: 0.8em;
+  margin: 0;
+}
+
+section>h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc((1lh - 0.92em) / 2);
+  box-sizing: border-box;
+  width: 0.32em;
+  height: 0.92em;
+  background: transparent;
+  backdrop-filter: blur(1px);
+  border: 5px solid black;
+  filter: var(--decoration-shadow);
+}
+
+/* h2 はスライドタイトル (position: absolute で固定), h3–h6 はコンテンツ内の小見出し.
+   いずれも --text (本文色) に揃える. h1 の --primary より軽く, 本文と区別しない設計. */
+section>h2,
+section>h3,
+section>h4,
+section>h5,
+section>h6 {
+  color: var(--text);
+}
+
+/* h3–h6 を本文フォントサイズより少しだけ大きくして視覚的な階層を作る.
+   1.15em = 本文の約 15% 増し. 過度に大きくせず, 段落の区切りとして機能させる. */
+section h3,
+section h4,
+section h5,
+section h6 {
+  font-size: 1.15em;
+}
+
+/* 太字: 色で区別し, font-weight は通常に戻す. */
+section strong {
+  color: var(--accent);
+  font-weight: 500;
 }
 
 /* インラインコード (`code`) とコードブロック (<pre> 内の <code>) は
@@ -46,6 +229,92 @@ section {
 code,
 pre {
   font-family: monospace;
+}
+
+/* ===== コンテンツ要素 ===== */
+
+/* 箇条書きをシェブロンデザインにする.
+   深さ 1→2→3 に従ってグレーを暗→中→淡にする. */
+section ul {
+  list-style: none !important;
+  padding-left: 0 !important;
+}
+
+section ol {
+  padding-left: 0 !important;
+  list-style-position: inside !important;
+}
+
+section ul>li {
+  --col-2: #888;
+  position: relative;
+  padding-left: 1.2em !important;
+}
+
+section ul li ul>li {
+  --col-2: #aaa;
+}
+
+section ul li ul li ul>li {
+  --col-2: #bbb;
+}
+
+section ul>li::before {
+  content: '';
+  position: absolute;
+  left: 0.3em;
+  top: 0.55em;
+  width: 0.34em;
+  height: 0.34em;
+  border-right: 9px solid var(--col-2);
+  border-bottom: 9px solid var(--col-2);
+  transform: rotate(-45deg);
+  /* rotate(-45deg) のローカル座標補正: screen(15,15) を得るには local(0,21) が必要 */
+  filter: drop-shadow(0px 9px 9px rgba(0, 0, 0, 0.09));
+}
+
+/* テーブルのデザイン.
+   縦線・行間の横線をなくし, 上下に線 (5px = 視覚 約1.67px), ヘッダーと本文の間に線 (3px = 視覚 1px) を引く.
+   キャンバスが 3x のため, 視覚上の目標値の 3 倍の px 値を指定している.
+   上辺と下辺を table 要素自体に設定することで, 上下が同じ描画パスになり太さが均一になる.
+   border-collapse: collapse で隣接セルの境界線を共有させ, 二重線を防ぐ. */
+section table {
+  border-collapse: collapse;
+  border-top: 5px solid currentColor;
+  border-bottom: 5px solid currentColor;
+  margin: 1em auto;
+}
+
+/* blockquote は Note / Alert / Hint などの情報ボックスに使用する.
+   default テーマの左ボーダーと背景色はそのまま継承し, 上下マージンだけ統一する. */
+section blockquote {
+  margin: 1em 0;
+}
+
+/* すべてのセルのボーダーと背景色をリセットする.
+   default テーマが設定するボーダー・縞模様・背景色を消すために !important を使う. */
+section th,
+section td {
+  border: none !important;
+  background-color: transparent !important;
+  padding: 0.2em 1.2em !important;
+  white-space: nowrap;
+}
+
+/* 行単位の背景色もリセットする (縞模様などを消す). */
+section tr {
+  background-color: transparent !important;
+}
+
+/* ヘッダーセルは太字にする. */
+section th {
+  font-weight: bold;
+}
+
+/* ヘッダーと本文の境界線 (3px = 視覚 1px): ヘッダー行の下に引く.
+   border: none !important を上書きするため !important が必要. */
+section thead th {
+  border-bottom: 3px solid currentColor !important;
 }
 
 /* コードブロック (<pre>) を「薄い全体枠 + 四隅の太い角線」デザインにする.
@@ -108,250 +377,6 @@ section pre code {
   background: transparent !important;
 }
 
-/* h2 見出しを左上に固定する.
-   section は block レイアウトのため, default テーマが h2 に付与する
-   margin-top: var(--base-size-24) (= 130px) などの影響でスライドごとに位置がずれる.
-   position: absolute で section の padding-top/left 位置に固定し, ずれをなくす.
-   :has(> h2) でコンテンツの開始位置を h2 の高さ分だけ下げる.
-     h2 高さ ≈ 141px (line-height) + 34px (padding-bottom) = 175px
-     padding-top = 235.5 (section 元値) + 175 (h2) + 87 (gap) = 約 500px */
-section:has(> h2) {
-  padding-top: 500px;
-}
-
-/* 見出しの左に縦長の長方形装飾を付ける.
-   白地・黒枠の矩形を ::before で描き, シェブロンと同じ drop-shadow を適用する.
-   width: 0.32em, height: 0.92em でキャップハイトに近い高さを設定する.
-   border: 5px (視覚 約1.67px). */
-section>h2,
-section>h3 {
-  position: relative;
-  padding-left: 0.8em;
-}
-
-section>h2 {
-  position: absolute;
-  top: 235.5px;
-  left: 270px;
-  right: 235.5px;
-  margin: 0;
-}
-
-section>h2::before,
-section>h3::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: calc((1lh - 0.92em) / 2);
-  box-sizing: border-box;
-  width: 0.32em;
-  height: 0.92em;
-  background: transparent;
-  backdrop-filter: blur(1px);
-  border: 5px solid black;
-  filter: var(--decoration-shadow);
-}
-
-/* 箇条書きをシェブロンデザインにする.
-   深さ 1→2→3 に従ってグレーを暗→中→淡にする. */
-section ul {
-  list-style: none !important;
-  padding-left: 0 !important;
-}
-
-section ol {
-  padding-left: 0 !important;
-  list-style-position: inside !important;
-}
-
-section ul>li {
-  --col-2: #888;
-}
-
-section ul li ul>li {
-  --col-2: #aaa;
-}
-
-section ul li ul li ul>li {
-  --col-2: #bbb;
-}
-
-section ul>li {
-  position: relative;
-  padding-left: 1.2em !important;
-}
-
-section ul>li::before {
-  content: '';
-  position: absolute;
-  left: 0.3em;
-  top: 0.55em;
-  width: 0.34em;
-  height: 0.34em;
-  border-right: 9px solid var(--col-2);
-  border-bottom: 9px solid var(--col-2);
-  transform: rotate(-45deg);
-  /* rotate(-45deg) のローカル座標補正: screen(15,15) を得るには local(0,21) が必要 */
-  filter: drop-shadow(0px 9px 9px rgba(0, 0, 0, 0.09));
-}
-
-/* テーブルのデザイン.
-   縦線・行間の横線をなくし, 上下に線 (5px = 視覚 約1.67px), ヘッダーと本文の間に線 (3px = 視覚 1px) を引く.
-   キャンバスが 3x のため, 視覚上の目標値の 3 倍の px 値を指定している.
-   上辺と下辺を table 要素自体に設定することで, 上下が同じ描画パスになり太さが均一になる.
-   border-collapse: collapse で隣接セルの境界線を共有させ, 二重線を防ぐ. */
-section table {
-  border-collapse: collapse;
-  border-top: 5px solid currentColor;
-  border-bottom: 5px solid currentColor;
-  margin: 1em auto;
-}
-
-section blockquote {
-  margin: 1em 0;
-}
-
-/* すべてのセルのボーダーと背景色をリセットする.
-   default テーマが設定するボーダー・縞模様・背景色を消すために !important を使う. */
-section th,
-section td {
-  border: none !important;
-  background-color: transparent !important;
-  padding: 0.2em 1.2em !important;
-}
-
-/* 行単位の背景色もリセットする (縞模様などを消す). */
-section tr {
-  background-color: transparent !important;
-}
-
-/* ヘッダーセルは太字にする. */
-section th {
-  font-weight: bold;
-}
-
-/* ヘッダーと本文の境界線 (3px = 視覚 1px): ヘッダー行の下に引く.
-   border: none !important を上書きするため !important が必要. */
-section thead th {
-  border-bottom: 3px solid currentColor !important;
-}
-
-/* 全スライドに 5mm 方眼紙パターンの背景を設定する.
-   キャンバスが 3x (3840x2160) のため background-size を 74px にして
-   33% 縮小表示時に視覚上 約25px のマス目に見せる.
-   --grid-line: グリッド線の色. 不透明な固定色 (rgb(240, 240, 240)) を使うことで,
-   2 つのグラデーション層が交差点で重なっても上の層が下の層を完全に覆い,
-   色が濃くなる問題を回避している.
-   background-image の 2 層がそれぞれ横方向・縦方向の線を描く.
-   縦横同じ値を指定することで上下左右を完全に対称にしている.
-   グリッド線幅 3px = 視覚 1px (3x キャンバス). */
-section {
-  --grid-line: rgb(240, 240, 240);
-  background-color: #fcfcfc;
-  background-image:
-    /* 帯の右端から薄くなる影 (stop 値は 3x キャンバス基準) */
-    linear-gradient(90deg,
-      transparent var(--rail-width),
-      rgba(0, 0, 0, 0.20) calc(var(--rail-width) + 3px),
-      rgba(0, 0, 0, 0.10) calc(var(--rail-width) + 10px),
-      rgba(0, 0, 0, 0.05) calc(var(--rail-width) + 20px),
-      rgba(0, 0, 0, 0.03) calc(var(--rail-width) + 30px),
-      transparent calc(var(--rail-width) + 40px)),
-    linear-gradient(var(--grid-line) 3px, transparent 3px),
-    linear-gradient(90deg, var(--grid-line) 3px, transparent 3px);
-  background-size: 100% 100%, 74px 74px, 74px 74px;
-  background-position: 0 0, 70px 44px, 70px 44px;
-}
-
-/* 帯本体: 左端に半透明のすりガラスを置く. 区切り線をページ番号の上に描く. */
-section::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: var(--rail-width);
-  height: 100%;
-  background:
-    linear-gradient(var(--rail-divider), var(--rail-divider)) center bottom 120px / 80% 3px no-repeat,
-    rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-}
-
-/* default テーマの header・footer は font-size/left/top/bottom が 1x 基準の px で
-   ハードコードされているため, 3x キャンバスに合わせて 3 倍にオーバーライドする.
-   (default: font-size 18px, left 30px, top/bottom 21px → 各 3 倍) */
-section header,
-section footer {
-  font-size: 54px;
-  left: 90px;
-}
-
-/* スライドタイトルを帯内に 90° 反時計回りで表示 (6時→12時方向).
-   要素を横長 (width=縦スパン, height=フォント高) に置き,
-   底辺左端を軸に rotate(-90deg) することで帯内に収める.
-   left = 帯中央 + 行高の半分 = calc(var(--rail-width) / 2 + 0.5lh) で厳密に中央揃え. */
-section header {
-  left: calc(var(--rail-width) / 2 + 0.5lh);
-  bottom: 166px;
-  right: auto;
-  top: auto;
-  width: 1900px;
-  font-size: 36px;
-  font-weight: normal;
-  white-space: nowrap;
-  text-align: left;
-  transform-origin: 0 100%;
-  transform: rotate(-90deg);
-  z-index: 1;
-}
-
-section footer {
-  bottom: 63px;
-  left: 270px;
-}
-
-/* ページ番号を帯 (--rail-width) の水平中央・下部に配置する. */
-section::after {
-  font-size: 45px;
-  left: 0;
-  right: auto;
-  width: var(--rail-width);
-  bottom: 23px;
-  text-align: center;
-}
-
-/* ===== カラーパレット変数 ===== */
-section {
-  --text: #181410;
-  --primary: #2e2820;
-  --accent: #d2493a;
-  --link: #4a7a96;
-  --decoration-shadow: drop-shadow(12px 10px 2px rgba(0, 0, 0, 0.09));
-  --rail-divider: rgba(24, 20, 16, 0.45);
-
-  color: var(--text);
-}
-
-section a {
-  color: var(--link);
-}
-
-section h1 {
-  color: var(--primary);
-}
-
-section>h2,
-section>h3 {
-  color: var(--text);
-}
-
-/* 太字: 色で区別し, font-weight は通常に戻す. */
-section strong {
-  color: var(--accent);
-  font-weight: 500;
-}
-
 /* インライン画像をデフォルトで中央揃えにする.
    bg 画像は CSS background-image に変換されるため影響しない.
    .emoji は Marp が絵文字を変換した <img> なのでインライン表示を維持する. */
@@ -371,14 +396,27 @@ section p img~em {
   font-style: normal;
 }
 
-/* ===== 表紙スライド (_class: cover) ===== */
-
-/* section:has(> h2) の padding-top: 500px をリセットする. */
-section.cover:has(> h2) {
-  padding-top: 235.5px;
+/* ===== 本文スケーリング ===== */
+/* --body-scale は CSS 変数セクションで定義済み.
+   見出し以外のすべての直接子要素のフォントサイズに適用する. */
+section>p,
+section>ul,
+section>ol,
+section>blockquote,
+section>pre,
+section>table,
+section>.def,
+section>.thm,
+section>.cor,
+section>.ex,
+section>.proof,
+section>.cards {
+  font-size: calc(var(--body-scale) * 1em);
 }
 
-/* flex でコンテンツを上下中央に寄せる. 右側に同心円弧 SVG 装飾を合成する. */
+/* ===== 表紙スライド (_class: cover) ===== */
+
+/* flex でコンテンツを上下中央に寄せる. 右側に幾何学的 SVG 装飾を合成する. */
 section.cover {
   display: flex;
   flex-direction: column;
@@ -396,6 +434,11 @@ section.cover {
     linear-gradient(90deg, var(--grid-line) 3px, transparent 3px);
   background-size: 100% 100%, 100% 100%, 74px 74px, 74px 74px;
   background-position: 0 0, 0 0, 70px 44px, 70px 44px;
+}
+
+/* section:has(> h2) の padding-top: 500px をリセットする. */
+section.cover:has(> h2) {
+  padding-top: 235.5px;
 }
 
 /* 表紙ではページ番号を非表示にする. */
@@ -460,12 +503,6 @@ section.cover>p {
 
 /* ===== セクション見出しスライド (_class: section) ===== */
 
-/* section:has(> h2) の padding-top: 500px 上書きをリセットする.
-   section.section の子要素はすべて position: absolute なので実質無影響だが念のため. */
-section.section:has(> h2) {
-  padding-top: 235.5px;
-}
-
 /* 右側の幾何学的装飾 (SVG) をグリッド・帯と重ねて背景に合成する. */
 section.section {
   background-image:
@@ -481,6 +518,12 @@ section.section {
     linear-gradient(90deg, var(--grid-line) 3px, transparent 3px);
   background-size: 100% 100%, 100% 100%, 74px 74px, 74px 74px;
   background-position: 0 0, 0 0, 70px 44px, 70px 44px;
+}
+
+/* section:has(> h2) の padding-top: 500px 上書きをリセットする.
+   section.section の子要素はすべて position: absolute なので実質無影響だが念のため. */
+section.section:has(> h2) {
+  padding-top: 235.5px;
 }
 
 /* セクション番号: 大きく左に配置する. */
@@ -559,28 +602,6 @@ section.section>p {
   color: #bbb;
   font-weight: 400;
   margin: 0;
-}
-
-/* ===== 本文スケーリング ===== */
-/* 使い方: スライド内に <style scoped> section { --body-scale: 0.8; } </style> と書くと
-   見出し以外の本文全体を 0.8 倍にできる. デフォルトは 1 (等倍). */
-section {
-  --body-scale: 1;
-}
-
-section>p,
-section>ul,
-section>ol,
-section>blockquote,
-section>pre,
-section>table,
-section>.def,
-section>.thm,
-section>.cor,
-section>.ex,
-section>.proof,
-section>.cards {
-  font-size: calc(var(--body-scale) * 1em);
 }
 
 /* ===== 定理環境 (Theorem-like environments) ===== */
@@ -666,38 +687,52 @@ section>.cards {
   margin-bottom: 18px;
 }
 
-/* ===== カードレイアウト ===== */
-/* 使い方:
-     <div class="cards">
-     <div class="card">
-     本文. Markdown (箇条書き・数式など) が使える.
+/* ===== 多カラムレイアウト (.cols / .cards) ===== */
+/* .cols と .cards は等幅グリッドを共通ベースとする.
+   .cols: 素の多カラムグリッド (画像・テキストなど任意の内容を並べる).
+   .cards: カードスタイルの多カラムグリッド.
+   いずれも grid-template-columns を上書きすると列の比率を変えられる.
+   例: style="grid-template-columns: 1fr 2fr" */
 
-     </div>
-     </div>
-   カード枚数は任意 (flex: 1 で等幅に自動分割).
-   2 枚 → 2 カラム, 3 枚 → 3 カラム, …
-   カード見出しは **太字** または先頭の平文段落で表現する.
-   フォントサイズは <style scoped> section { --body-scale: 0.72; } </style> で調整する. */
-
-/* 横並びコンテナ: flex で等幅分割し, align-items: stretch で全カードの高さを揃える. */
+.cols,
 .cards {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 72px;
+}
+
+/* .cols: 画像とテキストの組み合わせなど, 各列を中央揃えで配置する. */
+.cols {
+  align-items: center;
+}
+
+/* .cols 内の画像はグリッド列幅いっぱいに引き伸ばす.
+   height: auto でアスペクト比を維持し, display: block で余白を除去する. */
+.cols img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* .cards: 全カードの高さを揃える. */
+.cards {
   align-items: stretch;
 }
 
-/* 個別カード: 上辺をアクセント色で強調し, 側面・下辺は薄いボーダーで囲む. */
+/* 個別カード: 上辺をアクセント色で強調し, 側面・下辺は薄いボーダーで囲む.
+   カード見出しは **太字** または先頭の平文段落で表現する.
+   フォントサイズは <style scoped> section { --body-scale: 0.72; } </style> で調整する. */
 .card {
-  flex: 1;
   border-top: 12px solid var(--accent);
-  border-left: 1px solid #00000040;
-  border-right: 1px solid #00000040;
-  border-bottom: 1px solid #00000040;
+  border-left: 1px solid rgba(0, 0, 0, 0.25);
+  border-right: 1px solid rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
   padding: 54px 66px;
   box-shadow: var(--card-shadow);
 }
 
-/* カード内の本文: 行間を広めに取る. */
+/* カード本文: 行間を広めに取り, 本文色をわずかに薄めて上辺のアクセントと対比させる.
+   先頭要素の上マージンは 0 に固定して, padding-top との二重余白を防ぐ. */
 .card>p,
 .card>ul,
 .card>ol {
@@ -713,4 +748,26 @@ section>.cards {
 .card>ul+p,
 .card>ol+p {
   margin-top: 24px;
+}
+
+/* .col: .cards の中で .card の代わりに使うシンプルな列クラス.
+   --col-color に色を渡すと, 上辺のボーダーと背景色に反映される. */
+.col {
+  padding: 60px 80px;
+  border-top: 8px solid var(--col-color, rgba(0, 0, 0, 0.12));
+  background: color-mix(in srgb, var(--col-color, rgba(0, 0, 0, 0.12)) 8%, transparent);
+}
+
+/* 列の先頭段落をラベル行として整形する.
+   font-size: 0.8em で本文より小さく, letter-spacing で疎に配置してラベルらしさを出す.
+   下マージンで本文との間隔を確保する. */
+.col>p:first-child {
+  font-size: 0.8em;
+  letter-spacing: 3px;
+  margin: 0 0 50px;
+}
+
+/* --col-color が指定された場合は section strong の色がそのまま使われる. */
+.col:not([style])>p:first-child strong {
+  color: var(--text);
 }
