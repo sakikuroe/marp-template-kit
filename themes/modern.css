@@ -9,7 +9,7 @@
 
 /* Google Fonts から使用するフォントを読み込む.
    ビルド時 (PDF 変換時) はコンテナがインターネットに接続してフォントを取得する. */
-@import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Kosugi&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Kosugi&family=M+PLUS+Rounded+1c:wght@400;700&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&display=swap');
 
 /* ===== CSS 変数 ===== */
 /* テーマ全体で参照するカスタムプロパティをここに集約して定義する.
@@ -228,7 +228,7 @@ section strong {
    section に指定したフォントがそのまま継承されてしまうため, ここで明示的に戻している. */
 code,
 pre {
-  font-family: monospace;
+  font-family: "JetBrains Mono", "M PLUS Rounded 1c", monospace;
 }
 
 /* ===== コンテンツ要素 ===== */
