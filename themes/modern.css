@@ -20,7 +20,7 @@ section {
   --marpit-root-font-size: 87px;
   /* 左帯の幅 (3x キャンバス基準, 視覚 約29px). コンテンツ領域は padding-left: 270px で帯と重ならない. */
   --rail-width: 88px;
-  /* section pre とカードで共有するシャドウ. */
+  /* コードブロックのシャドウ. */
   --card-shadow:
     0 1px 1px hsl(225 28% 18% / 0.05),
     0 3px 6px -2px hsl(225 30% 24% / 0.07),
@@ -58,6 +58,7 @@ section {
   width: 3840px;
   height: 2160px;
   font-size: 87px;
+  line-height: 1.75;
   padding: 235.5px;
   padding-left: 270px;
   position: relative;
@@ -263,7 +264,7 @@ section ul>li::before {
   content: '';
   position: absolute;
   left: 0.3em;
-  top: 0.55em;
+  top: 0.7em;
   width: 0.34em;
   height: 0.34em;
   border-right: 9px solid var(--col-2);
@@ -695,8 +696,9 @@ section.section>p {
 .cols {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 72px;
+  gap: 108px;
   align-items: stretch;
+  padding-inline: 108px;
 }
 
 /* 画像は列幅いっぱいに自動的に収まるようにする.
@@ -707,24 +709,68 @@ section.section>p {
   display: block;
 }
 
-/* .card: 上辺をアクセント色で強調するセルスタイル.
-   <div class="card"> をセルに使うとカード装飾が付く.
+/* .card: .cols 内で使用する汎用カードスタイル.
+   子要素に <div class="card"> を使うと枠線と角線が付く.
+   --card-accent: 角線の色. デフォルトは #4d4d4d (コードブロックと同一).
+   背景色を付ける場合は <div class="card filled"> とする.
+     背景色は color-mix(in srgb, var(--card-accent) 1%, transparent) で角線から自動計算される.
+   枠線の色は角線から color-mix(in srgb, var(--card-accent) 48%, white) で自動計算される.
    フォントサイズは <style scoped> section { --body-scale: 0.72; } </style> で調整する. */
 .card {
-  border-top: 12px solid var(--accent);
-  border-left: 1px solid rgba(0, 0, 0, 0.25);
-  border-right: 1px solid rgba(0, 0, 0, 0.25);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-  padding: 54px 66px;
-  box-shadow: var(--card-shadow);
+  --card-accent: #4d4d4d;
+  --card-corner-size: 60px;
+  --card-corner-line: 9px;
+  position: relative;
+  overflow: visible;
+  border: 5px solid color-mix(in srgb, var(--card-accent) 48%, white);
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  padding: 55px 70px;
+  margin-top: 1em;
 }
 
-/* カード本文: 行間を広めに取り, 本文色をわずかに薄めて上辺のアクセントと対比させる.
+/* .card.filled: 角線から背景色を自動計算して適用する. */
+.card.filled {
+  background: color-mix(in srgb, var(--card-accent) 1%, transparent);
+}
+
+.card::before,
+.card::after {
+  content: '';
+  position: absolute;
+  /* border の内縁から -7px (= border 5px + 中央揃えはみ出し 2px) で外縁に合わせる.
+     9px の角線を 5px の枠線に中央揃えするために必要なオフセット.
+     コードブロック (section pre) と同じ計算. */
+  inset: -7px;
+  pointer-events: none;
+}
+
+/* 4 隅の水平角線 */
+.card::before {
+  background:
+    linear-gradient(var(--card-accent), var(--card-accent)) top 0 left 0 / var(--card-corner-size) var(--card-corner-line) no-repeat,
+    linear-gradient(var(--card-accent), var(--card-accent)) top 0 right 0 / var(--card-corner-size) var(--card-corner-line) no-repeat,
+    linear-gradient(var(--card-accent), var(--card-accent)) bottom 0 left 0 / var(--card-corner-size) var(--card-corner-line) no-repeat,
+    linear-gradient(var(--card-accent), var(--card-accent)) bottom 0 right 0 / var(--card-corner-size) var(--card-corner-line) no-repeat;
+}
+
+/* 4 隅の垂直角線 */
+.card::after {
+  background:
+    linear-gradient(var(--card-accent), var(--card-accent)) top 0 left 0 / var(--card-corner-line) var(--card-corner-size) no-repeat,
+    linear-gradient(var(--card-accent), var(--card-accent)) top 0 right 0 / var(--card-corner-line) var(--card-corner-size) no-repeat,
+    linear-gradient(var(--card-accent), var(--card-accent)) bottom 0 left 0 / var(--card-corner-line) var(--card-corner-size) no-repeat,
+    linear-gradient(var(--card-accent), var(--card-accent)) bottom 0 right 0 / var(--card-corner-line) var(--card-corner-size) no-repeat;
+}
+
+/* カード本文: 本文色をわずかに薄めて上辺のアクセントと対比させる.
    先頭要素の上マージンは 0 に固定して, padding-top との二重余白を防ぐ. */
 .card>p,
 .card>ul,
 .card>ol {
-  line-height: 1.9;
+  line-height: 1.75;
   color: rgba(24, 20, 16, 0.75);
   margin: 0;
 }
@@ -738,24 +784,4 @@ section.section>p {
   margin-top: 24px;
 }
 
-/* .col: 比較・強調用のシンプルな列スタイル.
-   --col-color に色を渡すと, 上辺のボーダーと背景色に反映される. */
-.col {
-  padding: 60px 80px;
-  border-top: 8px solid var(--col-color, rgba(0, 0, 0, 0.12));
-  background: color-mix(in srgb, var(--col-color, rgba(0, 0, 0, 0.12)) 8%, transparent);
-}
-
-/* 列の先頭段落をラベル行として整形する.
-   font-size: 0.8em で本文より小さく, letter-spacing で疎に配置してラベルらしさを出す.
-   下マージンで本文との間隔を確保する. */
-.col>p:first-child {
-  font-size: 0.8em;
-  letter-spacing: 3px;
-  margin: 0 0 50px;
-}
-
-/* --col-color が指定された場合は section strong の色がそのまま使われる. */
-.col:not([style])>p:first-child strong {
-  color: var(--text);
-}
+/* .col は廃止済み. .card と --card-accent, --card-background で代替する. */

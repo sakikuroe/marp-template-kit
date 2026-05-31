@@ -252,7 +252,7 @@ CREATING TABLES
 ## 基本的な表
 
 <style scoped>
-section { --body-scale: 0.8; }
+section { --body-scale: 0.75; }
 </style>
 
 Markdown の表記で、情報を表形式に整理できます。
@@ -480,7 +480,7 @@ section { --body-scale: 0.8; }
 section { --body-scale: 0.72; }
 </style>
 
-子要素に `.card` クラスを付けると, 上辺のアクセントラインとシャドウが付きます。
+子要素に `.card` クラスを付けると, 枠線と角線が付きます. `--card-accent` で色を変えられます. 枠線の色は角線から自動で計算されます. 背景色を付ける場合は `filled` クラスを追加します.
 
 <div class="cols">
 <div class="card">
@@ -550,13 +550,14 @@ Step 4
 ## カラムレイアウト: 比較
 
 <style scoped>
-.col:last-child { --col-color: var(--accent); }
+section { --body-scale: 0.8; }
+.card.filled:last-child { --card-accent: var(--accent); }
 </style>
 
-子要素に `.col` クラスを付けると, `--col-color` で上辺の色と背景色を変えられます。
+子要素に `.card` クラスを付けると, 枠線と角線が付きます. `--card-accent` で色を変えられます. 枠線の色は角線から自動で計算されます. 背景色を付ける場合は `filled` クラスを追加します.
 
 <div class="cols">
-<div class="col">
+<div class="card filled">
 
 **従来の方法**
 
@@ -566,7 +567,7 @@ Step 4
 - 属人的なフロー
 
 </div>
-<div class="col">
+<div class="card filled">
 
 **新しいアプローチ**
 
