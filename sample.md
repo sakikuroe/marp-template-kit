@@ -338,7 +338,7 @@ THEOREM ENVIRONMENTS
 ## 定理環境の使い方
 
 <style scoped>
-section { --body-scale: 0.65; }
+section { --body-scale: 0.6; }
 </style>
 
 `<div class="クラス名">` の直後に空行を入れると、中身は Markdown としてレンダリングされます。**第 1 段落がラベル行**になります。
@@ -480,7 +480,7 @@ section { --body-scale: 0.8; }
 section { --body-scale: 0.72; }
 </style>
 
-子要素に `.card` クラスを付けると, 枠線と角線が付きます. `--card-accent` で色を変えられます. 枠線の色は角線から自動で計算されます. 背景色を付ける場合は `filled` クラスを追加します.
+子要素に `.card` クラスを付けると, 先頭の段落が見出しとして強調され, 下線で本文と区切られます. `--card-accent` で下線の色を変えられます.
 
 <div class="cols">
 <div class="card">
@@ -551,13 +551,13 @@ Step 4
 
 <style scoped>
 section { --body-scale: 0.8; }
-.card.filled:last-child { --card-accent: var(--accent); }
+.card:last-child { --card-accent: var(--accent); }
 </style>
 
-子要素に `.card` クラスを付けると, 枠線と角線が付きます. `--card-accent` で色を変えられます. 枠線の色は角線から自動で計算されます. 背景色を付ける場合は `filled` クラスを追加します.
+子要素に `.card` クラスを付けると, 先頭の段落が見出しとして強調され, 下線で本文と区切られます. `--card-accent` で下線の色を変えられます.
 
 <div class="cols">
-<div class="card filled">
+<div class="card">
 
 **従来の方法**
 
@@ -567,7 +567,7 @@ section { --body-scale: 0.8; }
 - 属人的なフロー
 
 </div>
-<div class="card filled">
+<div class="card">
 
 **新しいアプローチ**
 

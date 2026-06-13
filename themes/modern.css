@@ -26,6 +26,9 @@ section {
     0 3px 6px -2px hsl(225 30% 24% / 0.07),
     0 10px 18px -6px hsl(225 34% 34% / 0.075),
     0 28px 48px -18px hsl(225 52% 42% / 0.10);
+  /* カードのシャドウ. 右下にオフセットした長方形の影. */
+  --card-flat-shadow:
+    24px 24px 0 0 hsl(225 28% 18% / 0.08);
 
   /* --- 背景定数 --- */
   /* グリッド線の色. 不透明な固定色を使うことで, 2 層のグラデーションが交差点で重なっても
@@ -336,13 +339,13 @@ section pre {
   backdrop-filter: blur(1px);
   padding: 55px 70px !important;
   margin-top: 1em !important;
-  margin-bottom: 1em !important;
+  margin-bottom: 1.5em !important;
 
   --corner-size: 60px;
   --corner-line: 9px;
   --corner-color: #4d4d4d;
 
-  box-shadow: var(--card-shadow);
+  box-shadow: var(--card-flat-shadow);
 }
 
 section pre::before,
@@ -699,6 +702,7 @@ section.section>p {
   gap: 108px;
   align-items: stretch;
   padding-inline: 108px;
+  margin-top: 108px;
 }
 
 /* 画像は列幅いっぱいに自動的に収まるようにする.
@@ -709,65 +713,41 @@ section.section>p {
   display: block;
 }
 
-/* .card: .cols 内で使用する汎用カードスタイル.
-   子要素に <div class="card"> を使うと枠線と角線が付く.
-   --card-accent: 角線の色. デフォルトは #4d4d4d (コードブロックと同一).
-   背景色を付ける場合は <div class="card filled"> とする.
-     背景色は color-mix(in srgb, var(--card-accent) 1%, transparent) で角線から自動計算される.
-   枠線の色は角線から color-mix(in srgb, var(--card-accent) 48%, white) で自動計算される.
+/* .card: .cols 内で使用する, 見出し・下線・本文で構成するスタイル.
+   先頭の段落を見出しとして強調し, --card-accent 色の下線で本文と区切る.
+   --card-accent: 見出し下線の色. デフォルトは #4d4d4d (コードブロックの角線と同じ色).
    フォントサイズは <style scoped> section { --body-scale: 0.72; } </style> で調整する. */
 .card {
   --card-accent: #4d4d4d;
-  --card-corner-size: 60px;
-  --card-corner-line: 9px;
-  position: relative;
-  overflow: visible;
-  border: 5px solid color-mix(in srgb, var(--card-accent) 48%, white);
-  border-radius: 0;
-  background: transparent;
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-  padding: 55px 70px;
-  margin-top: 1em;
 }
 
-/* .card.filled: 角線から背景色を自動計算して適用する. */
-.card.filled {
-  background: color-mix(in srgb, var(--card-accent) 1%, transparent);
+/* 見出し (先頭の段落): 本文より一回り大きく, h1~h3 と同じ --primary, font-weight: 600 で強調する.
+   直下に --card-accent 色の短い区切り線を引いて本文と区切る (section.section>h3 と同じ構成). */
+.card>p:first-child {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 30px;
 }
 
-.card::before,
-.card::after {
+.card>p:first-child::after {
   content: '';
-  position: absolute;
-  /* border の内縁から -7px (= border 5px + 中央揃えはみ出し 2px) で外縁に合わせる.
-     9px の角線を 5px の枠線に中央揃えするために必要なオフセット.
-     コードブロック (section pre) と同じ計算. */
-  inset: -7px;
-  pointer-events: none;
+  display: block;
+  width: 2.3em;
+  height: 4px;
+  background: var(--card-accent);
+  margin-top: 24px;
 }
 
-/* 4 隅の水平角線 */
-.card::before {
-  background:
-    linear-gradient(var(--card-accent), var(--card-accent)) top 0 left 0 / var(--card-corner-size) var(--card-corner-line) no-repeat,
-    linear-gradient(var(--card-accent), var(--card-accent)) top 0 right 0 / var(--card-corner-size) var(--card-corner-line) no-repeat,
-    linear-gradient(var(--card-accent), var(--card-accent)) bottom 0 left 0 / var(--card-corner-size) var(--card-corner-line) no-repeat,
-    linear-gradient(var(--card-accent), var(--card-accent)) bottom 0 right 0 / var(--card-corner-size) var(--card-corner-line) no-repeat;
+/* section strong (--accent / 500) を打ち消し, 見出しの色・太さに揃える. */
+.card>p:first-child strong {
+  color: var(--primary);
+  font-weight: 600;
 }
 
-/* 4 隅の垂直角線 */
-.card::after {
-  background:
-    linear-gradient(var(--card-accent), var(--card-accent)) top 0 left 0 / var(--card-corner-line) var(--card-corner-size) no-repeat,
-    linear-gradient(var(--card-accent), var(--card-accent)) top 0 right 0 / var(--card-corner-line) var(--card-corner-size) no-repeat,
-    linear-gradient(var(--card-accent), var(--card-accent)) bottom 0 left 0 / var(--card-corner-line) var(--card-corner-size) no-repeat,
-    linear-gradient(var(--card-accent), var(--card-accent)) bottom 0 right 0 / var(--card-corner-line) var(--card-corner-size) no-repeat;
-}
-
-/* カード本文: 本文色をわずかに薄めて上辺のアクセントと対比させる.
-   先頭要素の上マージンは 0 に固定して, padding-top との二重余白を防ぐ. */
-.card>p,
+/* カード本文: 本文色をわずかに薄めて見出しと対比させる.
+   先頭要素の上マージンは 0 に固定して, 見出しの下線との二重余白を防ぐ. */
+.card>p:not(:first-child),
 .card>ul,
 .card>ol {
   line-height: 1.75;
@@ -783,5 +763,3 @@ section.section>p {
 .card>ol+p {
   margin-top: 24px;
 }
-
-/* .col は廃止済み. .card と --card-accent, --card-background で代替する. */
