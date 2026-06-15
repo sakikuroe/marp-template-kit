@@ -524,12 +524,6 @@ section.section {
   background-position: 0 0, 0 0, 70px 44px, 70px 44px;
 }
 
-/* section:has(> h2) の padding-top: 500px 上書きをリセットする.
-   section.section の子要素はすべて position: absolute なので実質無影響だが念のため. */
-section.section:has(> h2) {
-  padding-top: 235.5px;
-}
-
 /* セクション番号: 大きく左に配置する. */
 section.section>h1 {
   position: absolute;
@@ -546,30 +540,11 @@ section.section>h1 {
   padding-left: 0;
 }
 
-/* 小さなサブタイトル: 見出し上の補足テキスト. */
-section.section>h2 {
-  position: absolute;
-  left: 1120px;
-  top: 894px;
-  right: 1350px;
-  font-size: 36px;
-  line-height: 1.4;
-  font-weight: 400;
-  color: rgba(210, 73, 58, 0.6);
-  letter-spacing: 6px;
-  margin: 0;
-  padding-left: 0;
-}
-
-section.section>h2::before {
-  display: none;
-}
-
-/* メイン見出し (短い区切り線付き). */
+/* メイン見出し: 縦方向中央に配置する. */
 section.section>h3 {
   position: absolute;
   left: 1120px;
-  top: 994px;
+  top: 983px;
   right: 939px;
   font-size: 136px;
   line-height: 1.1;
@@ -592,20 +567,6 @@ section.section>h3::after {
   height: 4px;
   background: rgba(210, 73, 58, 0.3);
   margin-top: 40px;
-}
-
-/* 英語サブタイトル: 区切り線の下, 字間広め. */
-section.section>p {
-  position: absolute;
-  left: 1120px;
-  top: 1242px;
-  right: 1350px;
-  font-size: 36px;
-  line-height: 1.4;
-  letter-spacing: 8px;
-  color: #bbb;
-  font-weight: 400;
-  margin: 0;
 }
 
 /* ===== 定理環境 (Theorem-like environments) ===== */
