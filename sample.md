@@ -252,7 +252,7 @@ CREATING TABLES
 ## 基本的な表
 
 <style scoped>
-section { --body-scale: 0.8; }
+section { --body-scale: 0.75; }
 </style>
 
 Markdown の表記で、情報を表形式に整理できます。
@@ -338,7 +338,7 @@ THEOREM ENVIRONMENTS
 ## 定理環境の使い方
 
 <style scoped>
-section { --body-scale: 0.65; }
+section { --body-scale: 0.6; }
 </style>
 
 `<div class="クラス名">` の直後に空行を入れると、中身は Markdown としてレンダリングされます。**第 1 段落がラベル行**になります。
@@ -480,7 +480,7 @@ section { --body-scale: 0.8; }
 section { --body-scale: 0.72; }
 </style>
 
-子要素に `.card` クラスを付けると, 上辺のアクセントラインとシャドウが付きます。
+子要素に `.card` クラスを付けると, 先頭の段落が見出しとして強調され, 下線で本文と区切られます. `--card-accent` で下線の色を変えられます.
 
 <div class="cols">
 <div class="card">
@@ -550,13 +550,14 @@ Step 4
 ## カラムレイアウト: 比較
 
 <style scoped>
-.col:last-child { --col-color: var(--accent); }
+section { --body-scale: 0.8; }
+.card:last-child { --card-accent: var(--accent); }
 </style>
 
-子要素に `.col` クラスを付けると, `--col-color` で上辺の色と背景色を変えられます。
+子要素に `.card` クラスを付けると, 先頭の段落が見出しとして強調され, 下線で本文と区切られます. `--card-accent` で下線の色を変えられます.
 
 <div class="cols">
-<div class="col">
+<div class="card">
 
 **従来の方法**
 
@@ -566,7 +567,7 @@ Step 4
 - 属人的なフロー
 
 </div>
-<div class="col">
+<div class="card">
 
 **新しいアプローチ**
 

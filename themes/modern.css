@@ -20,12 +20,15 @@ section {
   --marpit-root-font-size: 87px;
   /* 左帯の幅 (3x キャンバス基準, 視覚 約29px). コンテンツ領域は padding-left: 270px で帯と重ならない. */
   --rail-width: 88px;
-  /* section pre とカードで共有するシャドウ. */
+  /* コードブロックのシャドウ. */
   --card-shadow:
     0 1px 1px hsl(225 28% 18% / 0.05),
     0 3px 6px -2px hsl(225 30% 24% / 0.07),
     0 10px 18px -6px hsl(225 34% 34% / 0.075),
     0 28px 48px -18px hsl(225 52% 42% / 0.10);
+  /* カードのシャドウ. 右下にオフセットした長方形の影. */
+  --card-flat-shadow:
+    24px 24px 0 0 hsl(225 28% 18% / 0.08);
 
   /* --- 背景定数 --- */
   /* グリッド線の色. 不透明な固定色を使うことで, 2 層のグラデーションが交差点で重なっても
@@ -58,6 +61,7 @@ section {
   width: 3840px;
   height: 2160px;
   font-size: 87px;
+  line-height: 1.75;
   padding: 235.5px;
   padding-left: 270px;
   position: relative;
@@ -263,7 +267,7 @@ section ul>li::before {
   content: '';
   position: absolute;
   left: 0.3em;
-  top: 0.55em;
+  top: 0.7em;
   width: 0.34em;
   height: 0.34em;
   border-right: 9px solid var(--col-2);
@@ -335,13 +339,13 @@ section pre {
   backdrop-filter: blur(1px);
   padding: 55px 70px !important;
   margin-top: 1em !important;
-  margin-bottom: 1em !important;
+  margin-bottom: 1.5em !important;
 
   --corner-size: 60px;
   --corner-line: 9px;
   --corner-color: #4d4d4d;
 
-  box-shadow: var(--card-shadow);
+  box-shadow: var(--card-flat-shadow);
 }
 
 section pre::before,
@@ -695,8 +699,10 @@ section.section>p {
 .cols {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 72px;
+  gap: 108px;
   align-items: stretch;
+  padding-inline: 108px;
+  margin-top: 108px;
 }
 
 /* 画像は列幅いっぱいに自動的に収まるようにする.
@@ -707,24 +713,44 @@ section.section>p {
   display: block;
 }
 
-/* .card: 上辺をアクセント色で強調するセルスタイル.
-   <div class="card"> をセルに使うとカード装飾が付く.
+/* .card: .cols 内で使用する, 見出し・下線・本文で構成するスタイル.
+   先頭の段落を見出しとして強調し, --card-accent 色の下線で本文と区切る.
+   --card-accent: 見出し下線の色. デフォルトは #4d4d4d (コードブロックの角線と同じ色).
    フォントサイズは <style scoped> section { --body-scale: 0.72; } </style> で調整する. */
 .card {
-  border-top: 12px solid var(--accent);
-  border-left: 1px solid rgba(0, 0, 0, 0.25);
-  border-right: 1px solid rgba(0, 0, 0, 0.25);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-  padding: 54px 66px;
-  box-shadow: var(--card-shadow);
+  --card-accent: #4d4d4d;
 }
 
-/* カード本文: 行間を広めに取り, 本文色をわずかに薄めて上辺のアクセントと対比させる.
-   先頭要素の上マージンは 0 に固定して, padding-top との二重余白を防ぐ. */
-.card>p,
+/* 見出し (先頭の段落): 本文より一回り大きく, h1~h3 と同じ --primary, font-weight: 600 で強調する.
+   直下に --card-accent 色の短い区切り線を引いて本文と区切る (section.section>h3 と同じ構成). */
+.card>p:first-child {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 30px;
+}
+
+.card>p:first-child::after {
+  content: '';
+  display: block;
+  width: 2.3em;
+  height: 4px;
+  background: var(--card-accent);
+  margin-top: 24px;
+}
+
+/* section strong (--accent / 500) を打ち消し, 見出しの色・太さに揃える. */
+.card>p:first-child strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* カード本文: 本文色をわずかに薄めて見出しと対比させる.
+   先頭要素の上マージンは 0 に固定して, 見出しの下線との二重余白を防ぐ. */
+.card>p:not(:first-child),
 .card>ul,
 .card>ol {
-  line-height: 1.9;
+  line-height: 1.75;
   color: rgba(24, 20, 16, 0.75);
   margin: 0;
 }
@@ -736,26 +762,4 @@ section.section>p {
 .card>ul+p,
 .card>ol+p {
   margin-top: 24px;
-}
-
-/* .col: 比較・強調用のシンプルな列スタイル.
-   --col-color に色を渡すと, 上辺のボーダーと背景色に反映される. */
-.col {
-  padding: 60px 80px;
-  border-top: 8px solid var(--col-color, rgba(0, 0, 0, 0.12));
-  background: color-mix(in srgb, var(--col-color, rgba(0, 0, 0, 0.12)) 8%, transparent);
-}
-
-/* 列の先頭段落をラベル行として整形する.
-   font-size: 0.8em で本文より小さく, letter-spacing で疎に配置してラベルらしさを出す.
-   下マージンで本文との間隔を確保する. */
-.col>p:first-child {
-  font-size: 0.8em;
-  letter-spacing: 3px;
-  margin: 0 0 50px;
-}
-
-/* --col-color が指定された場合は section strong の色がそのまま使われる. */
-.col:not([style])>p:first-child strong {
-  color: var(--text);
 }
