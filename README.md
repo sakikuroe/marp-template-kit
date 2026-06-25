@@ -39,21 +39,17 @@ theme: modern
 ### 実行
 
 ```bash
-./build.sh components.md
-./build.sh samples/morning.md
+./build.sh <Markdown ファイル>
 ```
 
-`out/` ディレクトリに以下が生成されます.
-
-- `out/components.html` / `out/morning.html` — HTML
-- `out/components.pdf` / `out/morning.pdf` — PDF (`backdrop-filter` 対応, PNG 経由で変換)
+HTML と PDF (`backdrop-filter` 対応, PNG 経由で変換) が生成されます.
 
 ### 使用イメージの変更
 
 デフォルトは `docker.io/marpteam/marp-cli:v4.3.1` です. `MARP_IMAGE` 環境変数で上書きできます.
 
 ```bash
-MARP_IMAGE=docker.io/marpteam/marp-cli:latest ./build.sh components.md
+MARP_IMAGE=docker.io/marpteam/marp-cli:latest ./build.sh <Markdown ファイル>
 ```
 
 ### 注意
