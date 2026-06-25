@@ -1,21 +1,16 @@
-# img2pdf を実行するための専用コンテナイメージ.
-#
-# build.sh が PDF を生成する際, marp-cli の Chromium PDF エクスポートでは
-# backdrop-filter が正しく描画されない問題 (Chromium Issue #41477207) があるため,
-# 一度 PNG に書き出してから img2pdf で PDF に結合する方式を採用している.
-# この img2pdf の実行をコンテナ化することで次のメリットを得る.
-#   - ホスト環境に img2pdf をインストール不要.
-#   - --network=none で外部通信を遮断でき, セキュリティリスクを最小化できる.
-#   - marp-cli イメージと役割を分離し, それぞれの責務を明確にする.
+# build.sh で使用するツールをまとめたコンテナイメージ.
+# Google Chrome (PDF 印刷) と img2pdf (PNG→PDF 結合) を同一イメージに収める.
+# build.sh は --entrypoint でツールを使い分ける.
 
-# Python 公式スリムイメージをベースにする.
-# slim バリアントは不要なパッケージを除いたイメージで, サイズが小さくなる.
-FROM docker.io/python:3-slim
+FROM ubuntu:24.04
 
-# img2pdf: PNG / JPEG などのラスター画像を PDF に変換するライブラリ.
-# --no-cache-dir: pip キャッシュをイメージレイヤーに残さず, イメージサイズを削減する.
-RUN pip install img2pdf --no-cache-dir
-
-# コンテナ起動時に img2pdf CLI として直接動作させる.
-# build.sh は --pagesize や入力ファイル, -o などの引数をこのエントリーポイントに渡す.
-ENTRYPOINT ["python3", "-m", "img2pdf"]
+# Google Chrome stable: ブラウザ印刷と同等の品質で HTML を PDF に変換する.
+# img2pdf: PNG を PDF に結合する (PNG 経由 PDF ルート用).
+# --break-system-packages: Ubuntu 24.04 の PEP 668 制限を回避して pip でインストールする.
+RUN apt-get update && \
+    apt-get install -y wget ca-certificates python3 python3-pip && \
+    wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt-get install -y /tmp/chrome.deb && \
+    rm /tmp/chrome.deb && \
+    pip install img2pdf --no-cache-dir --break-system-packages && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
