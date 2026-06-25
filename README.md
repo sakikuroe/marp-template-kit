@@ -11,16 +11,19 @@ Marp を使ったスライド作成のためのテンプレートです.
 
 ```
 .
-├── build.sh          # ビルドスクリプト
-├── sample.md         # サンプルスライド (各要素の使い方チートシート)
+├── build.sh              # ビルドスクリプト
+├── components.md         # 使用できるコンポーネント一覧
+├── samples/              # 各種サンプルスライド
+│   └── morning.md        # 朝会報告のサンプル
 ├── themes/
-│   └── modern.css    # カスタムテーマ CSS
-└── out/              # 出力先 (build.sh が自動生成)
+│   └── modern.css        # カスタムテーマ CSS
+├── icons/                # ステータスアイコン (SVG)
+└── out/                  # 出力先 (build.sh が自動生成)
 ```
 
 ## VS Code プレビュー
 
-`.vscode/settings.json` にテーマが登録済みです. VS Code でこのフォルダを開き, `sample.md` の Marp プレビュー (`Ctrl+Shift+V`) を起動するとカスタムフォントが適用されます.
+`.vscode/settings.json` にテーマが登録済みです. VS Code でこのフォルダを開き, `components.md` や `samples/morning.md` の Marp プレビュー (`Ctrl+Shift+V`) を起動するとカスタムフォントが適用されます.
 
 新しい Markdown ファイルで同じテーマを使う場合は, フロントマターに以下を追加してください.
 
@@ -36,20 +39,21 @@ theme: modern
 ### 実行
 
 ```bash
-./build.sh sample.md
+./build.sh components.md
+./build.sh samples/morning.md
 ```
 
 `out/` ディレクトリに以下が生成されます.
 
-- `out/sample.html` — HTML
-- `out/sample.pdf` — PDF (`backdrop-filter` 対応, PNG 経由で変換)
+- `out/components.html` / `out/morning.html` — HTML
+- `out/components.pdf` / `out/morning.pdf` — PDF (`backdrop-filter` 対応, PNG 経由で変換)
 
 ### 使用イメージの変更
 
 デフォルトは `docker.io/marpteam/marp-cli:v4.3.1` です. `MARP_IMAGE` 環境変数で上書きできます.
 
 ```bash
-MARP_IMAGE=docker.io/marpteam/marp-cli:latest ./build.sh sample.md
+MARP_IMAGE=docker.io/marpteam/marp-cli:latest ./build.sh components.md
 ```
 
 ### 注意
