@@ -21,17 +21,14 @@ rel_input="$(realpath --relative-to="$script_dir" "$input")"
 base="$(basename "${input%.*}")"
 output_dir="$(dirname "$rel_input")"
 
-# MARP_IMAGE 環境変数でイメージを上書きできる.
-image="${MARP_IMAGE:-localhost/marp-template-kit/tools:v3}"
+image="localhost/marp-template-kit/tools"
 
 if ! podman info > /dev/null 2>&1; then
   echo "error: podman が利用できません. インストールと設定を確認してください." >&2
   exit 1
 fi
 
-if ! podman image exists "$image"; then
-  podman build -t "$image" -f "$script_dir/Containerfile" "$script_dir" >&2
-fi
+podman build -q -t "$image" -f "$script_dir/Containerfile" "$script_dir" >&2
 
 mkdir -p "$script_dir/.cache"
 
