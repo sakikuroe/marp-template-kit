@@ -1,6 +1,6 @@
 // marp-cli の --engine オプションに渡すカスタムエンジン.
-// Marp のコアクラスを継承し, mermaid コードブロックを SVG 図に変換して埋め込む.
-// marp-cli はデフォルトで Mermaid を解釈しないため, このファイルで処理を差し込む.
+// Marp のコアクラスを継承し, mermaid / matplotlib コードブロックを図・グラフに変換して埋め込む.
+// marp-cli はデフォルトでこれらを解釈しないため, このファイルで処理を差し込む.
 
 import { createRequire } from 'module';
 // marp-cli のコンテナ内パスから Marp コアを require する.
@@ -49,6 +49,38 @@ function renderMermaid(code) {
     process.stderr.write(`[mermaid] ${msg}\n`);
     return `<div style="color:red;border:1px solid red;padding:.5em">Mermaid error: see stderr</div>`;
   }
+}
+
+// matplotlib コードを受け取り, Python で実行して PNG を生成し base64 で返す.
+// _output 変数を自動注入するので, ユーザーは plt.savefig(_output) で保存先を指定する.
+function renderMatplotlib(code) {
+  const hash = createHash('sha256').update(code).digest('hex').slice(0, 16);
+  const pyPath = join(CACHE_DIR, `${hash}.py`);
+  const pngPath = join(CACHE_DIR, `${hash}.png`);
+
+  if (!existsSync(pngPath)) {
+    // _output: ユーザーが plt.savefig(_output) で参照する出力先パス.
+    // matplotlib.use / font の設定はヘッドレス環境向けに自動注入する.
+    const script = [
+      'import matplotlib',
+      'matplotlib.use("Agg")',  // ヘッドレス環境では非対話バックエンドが必要
+      'matplotlib.rcParams["font.family"] = "Noto Sans CJK JP"',
+      `_output = ${JSON.stringify(pngPath)}`,
+      code,
+    ].join('\n');
+    writeFileSync(pyPath, script);
+    try {
+      execSync(`python3 "${pyPath}"`, { timeout: 30000, stdio: ['pipe', 'pipe', 'pipe'] });
+    } catch (e) {
+      const msg = e.stderr?.toString() || e.message;
+      process.stderr.write(`[matplotlib] ${msg}\n`);
+      return `<div style="color:red;border:1px solid red;padding:.5em">matplotlib error: see stderr</div>`;
+    }
+  }
+
+  const b64 = readFileSync(pngPath).toString('base64');
+  // marp の 3840×2160 座標系に合わせて高さを指定する.
+  return `<img src="data:image/png;base64,${b64}" style="height:1300px;width:auto;max-width:100%;display:block;margin:0 auto">`;
 }
 
 // ローカル画像を base64 data URI に変換する.
@@ -108,6 +140,7 @@ class MarpWithMermaid extends Marp {
       // 言語指定に応じて専用レンダラーに委ねる. それ以外は元のレンダラーを使う.
       const lang = token.info.trim().split(/\s/)[0];
       if (lang === 'mermaid') return renderMermaid(token.content.trim());
+      if (lang === 'matplotlib') return renderMatplotlib(token.content.trim());
       return orig ? orig(tokens, idx, options, env, self) : self.renderToken(tokens, idx, options);
     };
   }

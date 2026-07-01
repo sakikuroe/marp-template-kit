@@ -422,6 +422,42 @@ gantt
 
 ---
 
+## 図の描画: matplotlib（折れ線グラフ）
+
+`matplotlib` コードブロックに Python コードを書くと、グラフ画像に自動変換して埋め込みます。`_output` 変数に出力先パスが自動設定されるため、`plt.savefig(_output)` で保存してください。複数回 `plt.savefig(_output)` を呼んだ場合は最後の図が表示されます。
+
+```matplotlib
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots()
+ax.plot([2021, 2022, 2023, 2024], [120, 145, 132, 180], marker='o')
+ax.set_title("売上推移")
+ax.set_xlabel("年度")
+ax.set_ylabel("売上（百万円）")
+plt.savefig(_output, bbox_inches="tight", dpi=150, transparent=True)
+plt.close()
+```
+
+---
+
+## 図の描画: matplotlib（棒グラフ）
+
+```matplotlib
+import matplotlib.pyplot as plt
+
+categories = ["機能A", "機能B", "機能C", "機能D"]
+values = [85, 62, 90, 74]
+fig, ax = plt.subplots()
+ax.bar(categories, values, color=["steelblue", "tomato", "seagreen", "orange"])
+ax.set_title("機能別満足度スコア")
+ax.set_ylabel("スコア（点）")
+ax.set_ylim(0, 100)
+plt.savefig(_output, bbox_inches="tight", dpi=150, transparent=True)
+plt.close()
+```
+
+---
+
 <!-- _class: section -->
 
 # 07
