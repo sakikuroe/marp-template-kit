@@ -422,6 +422,10 @@ gantt
 
 ---
 
+<style scoped>
+section { --body-scale: 0.75; }
+</style>
+
 ## 図の描画: matplotlib（折れ線グラフ）
 
 `matplotlib` コードブロックに Python コードを書くと、グラフ画像に自動変換して埋め込みます。`_output` 変数に出力先パスが自動設定されるため、`plt.savefig(_output)` で保存してください。複数回 `plt.savefig(_output)` を呼んだ場合は最後の図が表示されます。
