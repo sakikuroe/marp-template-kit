@@ -14,12 +14,12 @@ if [ ! -f "$input" ]; then
   exit 1
 fi
 
-# サブディレクトリの Markdown からも共有リソース (icons, assets) への相対パスが解決できるよう,
-# 常にプロジェクトルートをコンテナにマウントする.
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 rel_input="$(realpath --relative-to="$script_dir" "$input")"
 base="$(basename "${input%.*}")"
-output_dir="$(dirname "$rel_input")"
+input_dir="$(dirname "$rel_input")"
+
+mkdir -p "$script_dir/out/htmls" "$script_dir/out/pdfs" "$script_dir/out/png_pdfs"
 
 image="localhost/marp-template-kit/tools"
 
@@ -40,18 +40,19 @@ _out=$(podman run --rm --init \
   -v "$script_dir/themes:/themes:ro" \
   -e "LANG=${LANG:-C.UTF-8}" \
   -e "NODE_PATH=/home/marp/.cli/node_modules" \
+  -e "MARP_INPUT_DIR=/app/${input_dir}" \
   --entrypoint node \
   "$image" /home/marp/.cli/marp-cli.js \
   "$rel_input" \
   --theme-set /themes/modern.css \
   --engine /app/engine.mjs \
-  -o "${output_dir}/${base}.html" \
+  -o "out/htmls/${base}.html" \
   --allow-local-files 2>&1) || { rc=$?; printf '%s\n' "$_out" >&2; exit "$rc"; }
 printf '%s\n' "$_out" | grep -Ev '\[  WARN \] Insecure local file|^ +\S+\.md$' >&2 || true
 
 # .pdf を生成する.
 # --headless=new: Chrome 112+ 新ヘッドレスモード (印刷品質が旧より高い).
-# --allow-file-access-from-files: file:/// URL からローカル assets を読み込む.
+# HTML は自己完結しているため --allow-file-access-from-files は不要.
 podman run --rm --init \
   --userns=keep-id \
   --network=host \
@@ -63,10 +64,9 @@ podman run --rm --init \
   --no-sandbox \
   --disable-setuid-sandbox \
   --disable-dev-shm-usage \
-  --allow-file-access-from-files \
   --no-pdf-header-footer \
-  --print-to-pdf="/app/${output_dir}/${base}.pdf" \
-  "file:///app/${output_dir}/${base}.html"
+  --print-to-pdf="/app/out/pdfs/${base}.pdf" \
+  "file:///app/out/htmls/${base}.html"
 
 # _png.pdf を生成する (PNG 経由).
 # backdrop-filter が Chromium の PDF エクスポートパイプラインで描画されないため PNG 経由で変換する
@@ -80,6 +80,7 @@ _out=$(podman run --rm --init \
   -v "$script_dir/themes:/themes:ro" \
   -e "LANG=${LANG:-C.UTF-8}" \
   -e "NODE_PATH=/home/marp/.cli/node_modules" \
+  -e "MARP_INPUT_DIR=/app/${input_dir}" \
   --entrypoint node \
   "$image" /home/marp/.cli/marp-cli.js \
   "$rel_input" \
@@ -103,4 +104,4 @@ podman run --rm --init \
   -m img2pdf \
   --pagesize 2880ptx1620pt \
   "${png_args[@]}" \
-  -o "/app/${output_dir}/${base}_png.pdf"
+  -o "/app/out/png_pdfs/${base}.pdf"
