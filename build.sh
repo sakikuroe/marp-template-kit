@@ -91,7 +91,7 @@ printf '%s\n' "$_out" | grep -Ev '\[  WARN \] Insecure local file|^ +\S+\.md$' >
 
 # ls -v で数値順にソートし, ホスト側パスをコンテナ内パスに変換して img2pdf に渡す.
 # img2pdf はページ順に PNG を結合するため, 順序の保証が必要.
-mapfile -t png_args < <(ls -v "$script_dir/.cache/${base}".*.png | sed "s|$script_dir|/app|")
+mapfile -t png_args < <(ls -v "$script_dir/.cache/${base}".*.png | sed "s|^$script_dir|/app|")
 podman run --rm --init \
   --userns=keep-id \
   --network=none \
