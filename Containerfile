@@ -6,6 +6,7 @@ RUN apt-get update && \
     apt-get install -y /tmp/chrome.deb && \
     rm /tmp/chrome.deb && \
     pip install img2pdf --no-cache-dir --break-system-packages && \
+    PUPPETEER_SKIP_DOWNLOAD=1 npm install -g @mermaid-js/mermaid-cli && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -22,7 +22,7 @@ base="$(basename "${input%.*}")"
 output_dir="$(dirname "$rel_input")"
 
 # MARP_IMAGE 環境変数でイメージを上書きできる.
-image="${MARP_IMAGE:-localhost/marp-template-kit/tools:v2}"
+image="${MARP_IMAGE:-localhost/marp-template-kit/tools:v3}"
 
 if ! podman info > /dev/null 2>&1; then
   echo "error: podman が利用できません. インストールと設定を確認してください." >&2
@@ -42,10 +42,12 @@ _out=$(podman run --rm --init \
   -v "$script_dir:/app" \
   -v "$script_dir/themes:/themes:ro" \
   -e "LANG=${LANG:-C.UTF-8}" \
+  -e "NODE_PATH=/home/marp/.cli/node_modules" \
   --entrypoint node \
   "$image" /home/marp/.cli/marp-cli.js \
   "$rel_input" \
   --theme-set /themes/modern.css \
+  --engine /app/engine.mjs \
   -o "${output_dir}/${base}.html" \
   --allow-local-files 2>&1) || { rc=$?; printf '%s\n' "$_out" >&2; exit "$rc"; }
 printf '%s\n' "$_out" | grep -Ev '\[  WARN \] Insecure local file|^ +\S+\.md$' >&2 || true
@@ -80,10 +82,12 @@ _out=$(podman run --rm --init \
   -v "$script_dir:/app" \
   -v "$script_dir/themes:/themes:ro" \
   -e "LANG=${LANG:-C.UTF-8}" \
+  -e "NODE_PATH=/home/marp/.cli/node_modules" \
   --entrypoint node \
   "$image" /home/marp/.cli/marp-cli.js \
   "$rel_input" \
   --theme-set /themes/modern.css \
+  --engine /app/engine.mjs \
   --images png \
   -o ".cache/${base}.png" \
   --allow-local-files 2>&1) || { rc=$?; printf '%s\n' "$_out" >&2; exit "$rc"; }
