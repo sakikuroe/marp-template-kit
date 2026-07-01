@@ -10,7 +10,7 @@ const { Marp } = require('@marp-team/marp-core');
 import { execSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { createHash } from 'crypto';
-import { join } from 'path';
+import { join, resolve, extname } from 'path';
 
 // mmdc が生成した SVG の一時置き場. ビルド中は同じ図を何度も変換しないようキャッシュする.
 const CACHE_DIR = '/tmp/marp-mermaid';
@@ -51,21 +51,76 @@ function renderMermaid(code) {
   }
 }
 
+// ローカル画像を base64 data URI に変換する.
+// build.sh が MARP_INPUT_DIR に markdown ファイルのディレクトリを渡す.
+// http(s):// や data: で始まるパスはそのまま返す.
+const INPUT_DIR = process.env.MARP_INPUT_DIR || '/app';
+const PROJECT_ROOT = '/app';
+const MIME = {
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif', '.svg': 'image/svg+xml', '.webp': 'image/webp',
+};
+
+function embedImage(src, baseDir = INPUT_DIR) {
+  if (/^(https?:|data:)/.test(src)) return src;
+  const abs = resolve(baseDir, src);
+  if (!existsSync(abs)) return src;
+  const mime = MIME[extname(abs).toLowerCase()] ?? 'application/octet-stream';
+  const b64 = readFileSync(abs).toString('base64');
+  return `data:${mime};base64,${b64}`;
+}
+
 // Marp のコアクラスを継承し, コードブロックのレンダラーを上書きする.
 class MarpWithMermaid extends Marp {
   constructor(opts) {
     super(opts);
     const md = this.markdown;
+
+    // ローカル画像を base64 data URI に変換する core rule.
+    // marp の画像プラグインは image トークンを renderer より前に処理するため,
+    // renderer の上書きでは効かない. core rule でトークンを直接書き換える.
+    md.core.ruler.push('embed_local_images', (state) => {
+      const replaceSrc = (s) => embedImage(s);
+      for (const block of state.tokens) {
+        // インライン画像: inline トークンの children に image トークンがある.
+        if (block.type === 'inline' && block.children) {
+          for (const t of block.children) {
+            if (t.type === 'image') {
+              const i = t.attrIndex('src');
+              if (i >= 0) t.attrs[i][1] = replaceSrc(t.attrs[i][1]);
+            }
+            // marp が image を html_inline に変換していた場合も対応する.
+            if (t.type === 'html_inline') {
+              t.content = t.content.replace(/src="([^"]+)"/g, (_, s) => `src="${replaceSrc(s)}"`);
+            }
+          }
+        }
+        if (block.type === 'html_block') {
+          block.content = block.content.replace(/src="([^"]+)"/g, (_, s) => `src="${replaceSrc(s)}"`);
+        }
+      }
+    });
+
     const orig = md.renderer.rules.fence?.bind(md.renderer);
     // fence = コードブロック (``` ... ```) のレンダラー.
     md.renderer.rules.fence = (tokens, idx, options, env, self) => {
       const token = tokens[idx];
-      // 言語指定が "mermaid" のブロックだけ SVG に変換し, それ以外は元のレンダラーに委ねる.
-      if (token.info.trim().split(/\s/)[0] === 'mermaid') {
-        return renderMermaid(token.content.trim());
-      }
+      // 言語指定に応じて専用レンダラーに委ねる. それ以外は元のレンダラーを使う.
+      const lang = token.info.trim().split(/\s/)[0];
+      if (lang === 'mermaid') return renderMermaid(token.content.trim());
       return orig ? orig(tokens, idx, options, env, self) : self.renderToken(tokens, idx, options);
     };
+  }
+
+  // CSS の url() 参照もプロジェクトルート基準で base64 に変換する.
+  // modern.css の背景画像など, テーマ CSS が参照するローカルファイルを自己完結 HTML に埋め込む.
+  render(markdown, env) {
+    const result = super.render(markdown, env);
+    result.css = result.css.replace(/url\((['"]?)([^'")]+)\1\)/g, (match, q, path) => {
+      const embedded = embedImage(path, PROJECT_ROOT);
+      return embedded === path ? match : `url(${q}${embedded}${q})`;
+    });
+    return result;
   }
 }
 
