@@ -323,6 +323,105 @@ print(fib_numbers)
 
 ---
 
+## 図の描画: Mermaid（フローチャート）
+
+`look: handDrawn` を指定すると手書き風のスタイルになります。
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+flowchart TD
+  A[開始] --> B{条件分岐}
+  B -->|Yes| C[処理A]
+  B -->|No| D[処理B]
+  C --> E[完了]
+  D --> E
+```
+
+---
+
+## 図の描画: Mermaid（ステートダイアグラム）
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+stateDiagram-v2
+  [*] --> 待機中
+  待機中 --> 処理中 : リクエスト受信
+  処理中 --> 成功 : 完了
+  処理中 --> エラー : 失敗
+  エラー --> 待機中 : リトライ
+  成功 --> [*]
+```
+
+---
+
+## 図の描画: Mermaid（クラス図）
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+classDiagram
+  Animal <|-- 犬
+  Animal <|-- 猫
+  Animal : +名前 string
+  Animal : +鳴く() void
+  犬 : +フェッチ() void
+  猫 : +毛づくろい() void
+```
+
+---
+
+## 図の描画: Mermaid（円グラフ）
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+pie title 言語別コード比率
+  "TypeScript" : 45
+  "Python" : 30
+  "Go" : 15
+  "その他" : 10
+```
+
+---
+
+## 図の描画: Mermaid（ガントチャート）
+
+```mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+gantt
+  title プロジェクト計画
+  dateFormat YYYY-MM-DD
+  axisFormat %m/%d
+  section 設計
+    要件定義    : 2025-01-01, 7d
+    設計書作成  : 7d
+  section 開発
+    実装        : 14d
+    テスト      : 7d
+  section リリース
+    デプロイ    : 1d
+```
+
+---
+
 <!-- _class: section -->
 
 # 07
