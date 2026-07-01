@@ -19,6 +19,10 @@ September 1, 2025
 
 # 目次
 
+<style scoped>
+section { --body-scale: 0.9; }
+</style>
+
 01. はじめに
 02. 基本的なコンテンツ
 03. レイアウトと視覚要素
@@ -188,6 +192,10 @@ TPO に合わせて、適切に使用することが重要です。
 
 ## 画像のサイズ指定
 
+<style scoped>
+section pre { font-size: 0.75em; }
+</style>
+
 サイズは CSS 長さ単位（`px`・`cm` 等）で指定します。パーセント（`%`）は使用できません。
 
 ```markdown
@@ -252,7 +260,7 @@ CREATING TABLES
 ## 基本的な表
 
 <style scoped>
-section { --body-scale: 0.75; }
+section { --body-scale: 0.68; }
 </style>
 
 Markdown の表記で、情報を表形式に整理できます。
@@ -422,6 +430,159 @@ gantt
 
 ---
 
+<style scoped>
+section { --body-scale: 0.68; }
+</style>
+
+## 図の描画: matplotlib（折れ線グラフ）
+
+`matplotlib` コードブロックに Python コードを書くと、グラフ画像に自動変換して埋め込みます。`_output` 変数に出力先パスが自動設定されるため、`plt.savefig(_output)` で保存してください。複数回 `plt.savefig(_output)` を呼んだ場合は最後の図が表示されます。
+
+```matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+
+years = [2016, 2017, 2018, 2019, 2020, 2021, 2022]
+datasets = {
+    "OceanOS":   {"color": "#801020", "values": [65, 63, 62, 60, 58, 55, 53]},
+    "GarnetOS":  {"color": "#a65762", "values": [25, 27, 29, 31, 34, 38, 42]},
+    "TitanOS":   {"color": "#7e7e7e", "values": [5,  6,  7,  6,  8,  9,  8]},
+    "MercuryOS": {"color": "#b8b8b8", "values": [5,  4,  2,  3,  2,  1,  1]},
+}
+
+fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+fig.patch.set_facecolor('white')
+
+for name, data in datasets.items():
+    ax.plot(years, data["values"], color=data["color"],
+            marker='o', markersize=7, linestyle='-', linewidth=2.5, clip_on=False)
+    ax.text(years[-1] + 0.1, data["values"][-1], name,
+            color=data["color"], fontsize=12, va='center', fontweight='medium')
+
+ax.set_facecolor('white')
+ax.spines['top'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.yaxis.tick_right()
+ax.yaxis.set_label_position("right")
+ax.set_ylim(0, 80)
+ax.set_yticks(np.arange(0, 81, 10))
+ax.grid(axis='y', color='gray', linestyle='-', linewidth=0.5, alpha=0.2)
+ax.set_axisbelow(True)
+ax.tick_params(axis='x', length=0, colors='#333333')
+ax.tick_params(axis='y', length=0, colors='#333333')
+ax.set_xticks(years)
+ax.text(1.0, 1.05, "市場シェア (%)", transform=ax.transAxes, ha='right', fontsize=10, color='gray')
+
+annotations = [
+    {"text": "人気の「Garnet 10」\nモデル発売",  "text_pos": (2018.3, 45), "target_pos": (2019, 31), "color": "#a65762"},
+    {"text": "廉価版シリーズの\n生産終了",        "text_pos": (2019.5, 70), "target_pos": (2020, 58), "color": "#801020"},
+    {"text": "大手IT企業による\n買収",            "text_pos": (2021.5, 25), "target_pos": (2020, 8),  "color": "#7e7e7e"},
+]
+for an in annotations:
+    ax.annotate(an["text"], xy=an["target_pos"], xytext=an["text_pos"],
+                ha='center', va='center', color='white', fontsize=9, fontweight='bold',
+                bbox=dict(boxstyle="round,pad=0.6", fc=an["color"], ec="none"),
+                arrowprops=dict(fc=an["color"], ec="none", width=3))
+
+ax.set_xlim(2015.8, 2023.2)
+plt.tight_layout()
+plt.savefig(_output, bbox_inches="tight", dpi=150, transparent=True)
+plt.close()
+```
+
+---
+
+## 図の描画: matplotlib（円グラフ）
+
+```matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+
+labels = ['水力', '風力', '太陽光', 'バイオ燃料', 'その他']
+sizes  = [56, 20, 15, 6, 3]
+colors = ['#801020', '#a65762', '#a1a1a1', '#b8b8b8', '#cecece']
+
+fig, ax = plt.subplots(figsize=(8, 8), dpi=100)
+wedges, _ = ax.pie(sizes, colors=colors, startangle=90, counterclock=False,
+                   wedgeprops={'linewidth': 3, 'edgecolor': 'white'})
+
+for i, w in enumerate(wedges):
+    angle = (w.theta1 + w.theta2) / 2
+    rad   = np.deg2rad(angle)
+    if sizes[i] > 5:
+        x, y = 0.7 * np.cos(rad), 0.7 * np.sin(rad)
+        text_color = 'white' if i <= 1 else '#333333'
+        ax.text(x, y, f"{labels[i]}\n{sizes[i]}%",
+                ha='center', va='center', color=text_color, fontsize=16, fontweight='bold')
+    else:
+        lx, ly = np.cos(rad), np.sin(rad)
+        tx, ty = 1.2 * np.cos(rad), 1.2 * np.sin(rad)
+        ha = 'right' if angle > 180 else 'left'
+        ax.annotate(f"{labels[i]} {sizes[i]}%", xy=(lx, ly), xytext=(tx, ty),
+                    arrowprops=dict(arrowstyle="-", connectionstyle="arc3,rad=0.1", color='black'),
+                    fontsize=14, ha=ha, va='center')
+
+ax.axis('equal')
+ax.set_title("世界の再生可能エネルギー発電量シェア (2023年)", fontsize=18, pad=50)
+plt.savefig(_output, bbox_inches="tight", dpi=150, transparent=True)
+plt.close()
+```
+
+---
+
+## 図の描画: matplotlib（複合グラフ）
+
+```matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+
+quarters = ["第1四半期", "第2四半期", "第3四半期", "第4四半期", "次期予測"]
+x_pos   = np.arange(len(quarters))
+sales   = [50, 75, 90, 80, 110]
+bar_colors = ["#cecece"] * 3 + ["#a65762"] * 2
+line_y  = [18, 28, 33, 22, 38]
+pct     = [15, 25, 28, 18, 32]
+lbl_bg  = ["#7e7e7e"] * 3 + ["#801020"] * 2
+
+fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+fig.patch.set_facecolor("white")
+ax.set_title("四半期ごとの売上と利益率の分析", fontsize=16, fontweight="bold", pad=20)
+
+ax.bar(x_pos, sales, width=0.5, color=bar_colors, zorder=1, label="売上高 (千ドル)")
+
+line_color = "#801020"
+ax.plot(x_pos, line_y, color=line_color, marker="o", markersize=8,
+        markerfacecolor="white", markeredgecolor=line_color, markeredgewidth=2,
+        zorder=2, label="利益率")
+
+for i in range(len(quarters)):
+    ax.text(x_pos[i], line_y[i] + 5, f"{pct[i]}%",
+            ha="center", va="bottom", color="white", fontsize=12, fontweight="bold",
+            bbox=dict(boxstyle="round,pad=0.2", fc=lbl_bg[i], ec="none"), zorder=3)
+
+ax.set_facecolor("white")
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+ax.spines["left"].set_visible(False)
+ax.set_ylim(0, 120)
+ax.set_yticks(np.arange(0, 121, 20))
+ax.grid(axis="y", color="gray", linestyle="-", linewidth=0.5, alpha=0.2)
+ax.set_axisbelow(True)
+ax.set_xticks(x_pos)
+ax.set_xticklabels(quarters, fontsize=12)
+ax.tick_params(axis="x", length=0)
+ax.tick_params(axis="y", length=0)
+ax.text(-0.05, 1.05, "単位: 千ドル", transform=ax.transAxes, ha="left", fontsize=10, color="gray")
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=12)
+
+plt.tight_layout(rect=[0, 0.1, 1, 0.95])
+plt.savefig(_output, bbox_inches="tight", dpi=150, transparent=True)
+plt.close()
+```
+
+---
+
 <!-- _class: section -->
 
 # 07
@@ -552,6 +713,10 @@ section { --body-scale: 0.8; }
 ---
 
 ## カラムレイアウト: 画像と本文
+
+<style scoped>
+section .cols img { max-height: 900px; width: auto; }
+</style>
 
 `.cols` に画像と本文を並べる例です。`style="grid-template-columns: 1fr 2fr"` で比率を変えられます。
 
