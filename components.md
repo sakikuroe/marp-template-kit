@@ -19,6 +19,10 @@ September 1, 2025
 
 # 目次
 
+<style scoped>
+section { --body-scale: 0.9; }
+</style>
+
 01. はじめに
 02. 基本的なコンテンツ
 03. レイアウトと視覚要素
@@ -188,6 +192,10 @@ TPO に合わせて、適切に使用することが重要です。
 
 ## 画像のサイズ指定
 
+<style scoped>
+section pre { font-size: 0.75em; }
+</style>
+
 サイズは CSS 長さ単位（`px`・`cm` 等）で指定します。パーセント（`%`）は使用できません。
 
 ```markdown
@@ -252,7 +260,7 @@ CREATING TABLES
 ## 基本的な表
 
 <style scoped>
-section { --body-scale: 0.75; }
+section { --body-scale: 0.68; }
 </style>
 
 Markdown の表記で、情報を表形式に整理できます。
@@ -423,7 +431,7 @@ gantt
 ---
 
 <style scoped>
-section { --body-scale: 0.75; }
+section { --body-scale: 0.68; }
 </style>
 
 ## 図の描画: matplotlib（折れ線グラフ）
@@ -705,6 +713,10 @@ section { --body-scale: 0.8; }
 ---
 
 ## カラムレイアウト: 画像と本文
+
+<style scoped>
+section .cols img { max-height: 900px; width: auto; }
+</style>
 
 `.cols` に画像と本文を並べる例です。`style="grid-template-columns: 1fr 2fr"` で比率を変えられます。
 
