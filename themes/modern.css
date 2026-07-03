@@ -442,7 +442,6 @@ section>p,
 section>ul,
 section>ol,
 section>blockquote,
-section>pre,
 section>table,
 section>.def,
 section>.thm,
@@ -451,6 +450,11 @@ section>.ex,
 section>.proof,
 section>.cols {
   font-size: calc(var(--body-scale) * 1em);
+}
+
+/* コードブロックは本文の 75% のサイズにする. */
+section>pre {
+  font-size: calc(var(--body-scale) * 0.75em);
 }
 
 /* ===== 表紙スライド (_class: cover) ===== */
