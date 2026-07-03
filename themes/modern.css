@@ -8,10 +8,6 @@
    このファイルに書いたスタイルで上書き・追加ができる. */
 @import 'default';
 
-/* Google Fonts から使用するフォントを読み込む.
-   ビルド時 (PDF 変換時) はコンテナがインターネットに接続してフォントを取得する. */
-@import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Kosugi&family=M+PLUS+Rounded+1c:wght@400;700&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&display=swap');
-
 /* ===== CSS 変数 ===== */
 /* テーマ全体で参照するカスタムプロパティをここに集約して定義する.
    調整頻度の高い値を一覧できるため, カスタマイズの起点として活用できる. */
@@ -59,9 +55,34 @@ section {
    キャンバスを 3 倍にして 5px/3px で描画し, 33% 縮小表示時に視覚上 約1.67px/1px に見せる.
    font-size・padding も 3 倍にしてレイアウト比率を維持する.
    すべてのスライドのフォントを Zen Kaku Gothic New に設定する.
-   フォントが読み込めなかった場合のフォールバックとして sans-serif を指定している. */
+   フォールバックには Noto Sans CJK JP (コンテナにインストール済み) を指定する. */
+
+/* Zen Kaku Gothic New はコンテナ内にビルド時に同梱している (Google Fonts の @import は使わない).
+   engine.mjs が url() を base64 data URI に変換して HTML に埋め込むため,
+   閲覧マシンにフォントがなくても, ビルド時にもネットワーク接続なしで同一表示になる. */
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  font-weight: 400;
+  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Regular.ttf");
+}
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  font-weight: 500;
+  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Medium.ttf");
+}
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  font-weight: 700;
+  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Bold.ttf");
+}
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  font-weight: 900;
+  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Black.ttf");
+}
+
 section {
-  font-family: "Zen Kaku Gothic New", 'Kosugi', 'BIZ UDPGothic', sans-serif;
+  font-family: "Zen Kaku Gothic New", "Noto Sans CJK JP";
   width: 3840px;
   height: 2160px;
   font-size: 87px;
@@ -199,12 +220,26 @@ section strong {
   font-weight: 500;
 }
 
+/* コンテナ内にインストールしたフォントを参照する.
+   engine.mjs が url() を base64 data URI に変換して HTML に埋め込むため,
+   閲覧マシンにフォントがなくても同一表示になる. */
+@font-face {
+  font-family: "Rounded Mgen+ 1m";
+  src: url("/usr/share/fonts/truetype/rounded-mgenplus/rounded-mgenplus-1m-regular.ttf");
+}
+
 /* インラインコード (`code`) とコードブロック (<pre> 内の <code>) は
    等幅フォントを維持するために上書きする.
    section に指定したフォントがそのまま継承されてしまうため, ここで明示的に戻している. */
 code,
 pre {
-  font-family: "JetBrains Mono", "M PLUS Rounded 1c", monospace;
+  font-family: "Rounded Mgen+ 1m";
+}
+
+/* 罫線文字 (╭ ─ ┬ │) が行間で分断されないよう, グリフ (1em) が行ボックスを埋める値にする.
+   section の line-height 1.75 を継承すると縦罫線が途切れる. */
+pre {
+  line-height: 1.0;
 }
 
 /* ===== コンテンツ要素 ===== */
@@ -407,7 +442,6 @@ section>p,
 section>ul,
 section>ol,
 section>blockquote,
-section>pre,
 section>table,
 section>.def,
 section>.thm,
@@ -416,6 +450,11 @@ section>.ex,
 section>.proof,
 section>.cols {
   font-size: calc(var(--body-scale) * 1em);
+}
+
+/* コードブロックは本文の 75% のサイズにする. */
+section>pre {
+  font-size: calc(var(--body-scale) * 0.75em);
 }
 
 /* ===== 表紙スライド (_class: cover) ===== */
@@ -668,7 +707,7 @@ section.section>p {
 .proof::before {
   content: 'Proof.';
   display: block;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: Georgia;
   font-style: italic;
   font-size: 0.85em;
   opacity: 0.7;

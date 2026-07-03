@@ -39,7 +39,9 @@ function renderMermaid(code) {
   try {
     // -w 700: 図の描画幅 (px). 大きすぎると余白が広がるため適度な値にする.
     // -p: Chrome の起動オプション. コンテナ内でサンドボックスを無効化するための設定ファイル.
-    execSync(`mmdc -i "${mmdPath}" -o "${svgPath}" -p /app/mermaid-puppeteer.json -w 700`, {
+    // -c: フォント統一の設定. 図内テキストをテーマと同じ埋め込みフォントでレイアウト・描画し,
+    //     HTML と PDF で解決されるフォントが変わる問題を防ぐ.
+    execSync(`mmdc -i "${mmdPath}" -o "${svgPath}" -p /app/mermaid-puppeteer.json -c /app/mermaid-config.json -w 700`, {
       timeout: 60000,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
@@ -91,6 +93,7 @@ const PROJECT_ROOT = '/app';
 const MIME = {
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
   '.gif': 'image/gif', '.svg': 'image/svg+xml', '.webp': 'image/webp',
+  '.ttf': 'font/ttf', '.otf': 'font/otf', '.woff': 'font/woff', '.woff2': 'font/woff2',
 };
 
 function embedImage(src, baseDir = INPUT_DIR) {
