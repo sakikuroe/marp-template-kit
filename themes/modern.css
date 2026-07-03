@@ -8,10 +8,6 @@
    このファイルに書いたスタイルで上書き・追加ができる. */
 @import 'default';
 
-/* Google Fonts から使用するフォントを読み込む.
-   ビルド時 (PDF 変換時) はコンテナがインターネットに接続してフォントを取得する. */
-@import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Kosugi&family=M+PLUS+Rounded+1c:wght@400;700&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&display=swap');
-
 /* ===== CSS 変数 ===== */
 /* テーマ全体で参照するカスタムプロパティをここに集約して定義する.
    調整頻度の高い値を一覧できるため, カスタマイズの起点として活用できる. */
@@ -59,9 +55,34 @@ section {
    キャンバスを 3 倍にして 5px/3px で描画し, 33% 縮小表示時に視覚上 約1.67px/1px に見せる.
    font-size・padding も 3 倍にしてレイアウト比率を維持する.
    すべてのスライドのフォントを Zen Kaku Gothic New に設定する.
-   フォントが読み込めなかった場合のフォールバックとして sans-serif を指定している. */
+   フォールバックには Noto Sans CJK JP (コンテナにインストール済み) を指定する. */
+
+/* Zen Kaku Gothic New はコンテナ内にビルド時に同梱している (Google Fonts の @import は使わない).
+   engine.mjs が url() を base64 data URI に変換して HTML に埋め込むため,
+   閲覧マシンにフォントがなくても, ビルド時にもネットワーク接続なしで同一表示になる. */
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  font-weight: 400;
+  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Regular.ttf");
+}
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  font-weight: 500;
+  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Medium.ttf");
+}
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  font-weight: 700;
+  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Bold.ttf");
+}
+@font-face {
+  font-family: "Zen Kaku Gothic New";
+  font-weight: 900;
+  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Black.ttf");
+}
+
 section {
-  font-family: "Zen Kaku Gothic New", 'Kosugi', 'BIZ UDPGothic', sans-serif;
+  font-family: "Zen Kaku Gothic New", "Noto Sans CJK JP";
   width: 3840px;
   height: 2160px;
   font-size: 87px;
@@ -682,7 +703,7 @@ section.section>p {
 .proof::before {
   content: 'Proof.';
   display: block;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: Georgia;
   font-style: italic;
   font-size: 0.85em;
   opacity: 0.7;

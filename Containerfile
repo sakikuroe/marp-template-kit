@@ -4,6 +4,11 @@ FROM docker.io/marpteam/marp-cli:v4.3.1
 ARG ROUNDED_MGENPLUS_URL=https://ftp.iij.ad.jp/pub/osdn.jp/users/8/8598/rounded-mgenplus-20150602.7z
 ARG ROUNDED_MGENPLUS_TTF_NAME=rounded-mgenplus-1m-regular.ttf
 
+# "Zen Kaku Gothic New" 配布元 (google/fonts リポジトリー).
+# 実行時に Google Fonts (fonts.googleapis.com) へ接続する @import ではなく,
+# ビルド時にコンテナへ同梱することで, 生成 HTML を自己完結させる.
+ARG ZEN_KAKU_BASE_URL=https://raw.githubusercontent.com/google/fonts/main/ofl/zenkakugothicnew
+
 # 罫線グリフ半角化パッチ (詳細は patch_boxdrawing.py を参照).
 COPY patch_boxdrawing.py /tmp/patch_boxdrawing.py
 
@@ -23,6 +28,12 @@ RUN apt-get update && \
         "/usr/share/fonts/truetype/rounded-mgenplus/$ROUNDED_MGENPLUS_TTF_NAME" \; && \
     fc-cache -f /usr/share/fonts/truetype/rounded-mgenplus && \
     rm -rf /tmp/rounded-mgenplus /tmp/rounded-mgenplus.7z /tmp/patch_boxdrawing.py && \
+    mkdir -p /usr/share/fonts/truetype/zen-kaku-gothic-new && \
+    for w in Regular Medium Bold Black; do \
+        wget -q -O "/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-${w}.ttf" \
+            "$ZEN_KAKU_BASE_URL/ZenKakuGothicNew-${w}.ttf"; \
+    done && \
+    fc-cache -f /usr/share/fonts/truetype/zen-kaku-gothic-new && \
     apt-get remove -y p7zip-full && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
