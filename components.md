@@ -360,6 +360,24 @@ section { --body-scale: 0.9; }
 
 ---
 
+## 実験: Ambiguous width 文字 (Block Elements / Geometric Shapes) の表示確認
+
+<style scoped>
+section { --body-scale: 0.9; }
+</style>
+
+罫線 (Box Drawing) 以外の Ambiguous width 文字も半角で揃うか確認する実験用スライドです。
+
+```
+Block Elements : ▀▄█▌▐░▒▓ | 12345678
+Geometric Shapes: ■□▲△●○◆◇ | abcdefgh
+罫線と混在      : ╭─▓─┬─●─╮
+                  │ a │ b │
+                  ╰───┴───╯
+```
+
+---
+
 ## 図の描画: Mermaid（フローチャート）
 
 `look: handDrawn` を指定すると手書き風のスタイルになります。

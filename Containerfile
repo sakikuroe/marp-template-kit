@@ -9,8 +9,8 @@ ARG ROUNDED_MGENPLUS_TTF_NAME=rounded-mgenplus-1m-regular.ttf
 # ビルド時にコンテナへ同梱することで, 生成 HTML を自己完結させる.
 ARG ZEN_KAKU_BASE_URL=https://raw.githubusercontent.com/google/fonts/main/ofl/zenkakugothicnew
 
-# 罫線グリフ半角化パッチ (詳細は patch_boxdrawing.py を参照).
-COPY patch_boxdrawing.py /tmp/patch_boxdrawing.py
+# Ambiguous width グリフ半角化パッチ (詳細は patch_ambiguous_width.py を参照).
+COPY patch_ambiguous_width.py /tmp/patch_ambiguous_width.py
 
 RUN apt-get update && \
     apt-get install -y wget python3 python3-pip fonts-noto-cjk p7zip-full && \
@@ -24,10 +24,10 @@ RUN apt-get update && \
     7zr x -y /tmp/rounded-mgenplus.7z -o/tmp/rounded-mgenplus >/dev/null && \
     mkdir -p /usr/share/fonts/truetype/rounded-mgenplus && \
     find /tmp/rounded-mgenplus -type f -name "$ROUNDED_MGENPLUS_TTF_NAME" \
-        -exec python3 /tmp/patch_boxdrawing.py {} \
+        -exec python3 /tmp/patch_ambiguous_width.py {} \
         "/usr/share/fonts/truetype/rounded-mgenplus/$ROUNDED_MGENPLUS_TTF_NAME" \; && \
     fc-cache -f /usr/share/fonts/truetype/rounded-mgenplus && \
-    rm -rf /tmp/rounded-mgenplus /tmp/rounded-mgenplus.7z /tmp/patch_boxdrawing.py && \
+    rm -rf /tmp/rounded-mgenplus /tmp/rounded-mgenplus.7z /tmp/patch_ambiguous_width.py && \
     mkdir -p /usr/share/fonts/truetype/zen-kaku-gothic-new && \
     for w in Regular Medium Bold Black; do \
         wget -q -O "/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-${w}.ttf" \
