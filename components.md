@@ -331,6 +331,35 @@ print(fib_numbers)
 
 ---
 
+## 実験: 罫線文字を含むコードブロックの表示確認
+
+<style scoped>
+section { --body-scale: 0.9; }
+</style>
+
+等幅フォントで罫線がずれずに揃うか確認するための実験用スライドです。
+
+```
+╭────┬────────────────────────┬──────┬─────────┬────────────────╮
+│  # │          name          │ type │  size   │    modified    │
+├────┼────────────────────────┼──────┼─────────┼────────────────┤
+│  0 │ Containerfile          │ file │   531 B │ a day ago      │
+│  1 │ README.md              │ file │  2.1 kB │ 2 days ago     │
+│  2 │ assets                 │ dir  │  4.0 kB │ 2 months ago   │
+│  3 │ build.sh               │ file │  3.5 kB │ a day ago      │
+│  4 │ components.md          │ file │ 21.6 kB │ 33 seconds ago │
+│  5 │ engine.mjs             │ file │  7.8 kB │ 28 minutes ago │
+│  6 │ icons                  │ dir  │  4.0 kB │ 2 days ago     │
+│  7 │ mermaid-puppeteer.json │ file │   169 B │ a day ago      │
+│  8 │ out                    │ dir  │  4.0 kB │ a day ago      │
+│  9 │ samples                │ dir  │  4.0 kB │ 20 hours ago   │
+│ 10 │ serve.sh               │ file │  1.3 kB │ 28 minutes ago │
+│ 11 │ themes                 │ dir  │  4.0 kB │ 18 hours ago   │
+╰────┴────────────────────────┴──────┴─────────┴────────────────╯
+```
+
+---
+
 ## 図の描画: Mermaid（フローチャート）
 
 `look: handDrawn` を指定すると手書き風のスタイルになります。

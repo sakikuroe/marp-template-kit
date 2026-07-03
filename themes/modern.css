@@ -199,12 +199,26 @@ section strong {
   font-weight: 500;
 }
 
+/* コンテナ内にインストールしたフォントを参照する.
+   engine.mjs が url() を base64 data URI に変換して HTML に埋め込むため,
+   閲覧マシンにフォントがなくても同一表示になる. */
+@font-face {
+  font-family: "Rounded Mgen+ 1m";
+  src: url("/usr/share/fonts/truetype/rounded-mgenplus/rounded-mgenplus-1m-regular.ttf");
+}
+
 /* インラインコード (`code`) とコードブロック (<pre> 内の <code>) は
    等幅フォントを維持するために上書きする.
    section に指定したフォントがそのまま継承されてしまうため, ここで明示的に戻している. */
 code,
 pre {
-  font-family: "JetBrains Mono", "M PLUS Rounded 1c", monospace;
+  font-family: "Rounded Mgen+ 1m";
+}
+
+/* 罫線文字 (╭ ─ ┬ │) が行間で分断されないよう, グリフ (1em) が行ボックスを埋める値にする.
+   section の line-height 1.75 を継承すると縦罫線が途切れる. */
+pre {
+  line-height: 1.0;
 }
 
 /* ===== コンテンツ要素 ===== */
