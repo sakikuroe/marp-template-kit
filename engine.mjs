@@ -105,6 +105,102 @@ function embedImage(src, baseDir = INPUT_DIR) {
   return `data:${mime};base64,${b64}`;
 }
 
+// コードブロックのダウンロードボタンで使うファイル名の拡張子を, フェンスの言語指定から推測する.
+const LANG_EXT_MAP = {
+  python: 'py', javascript: 'js', typescript: 'ts', bash: 'sh', shell: 'sh', sh: 'sh',
+  json: 'json', yaml: 'yml', yml: 'yml', html: 'html', css: 'css', rust: 'rs', cpp: 'cpp',
+  c: 'c', go: 'go', java: 'java', ruby: 'rb', php: 'php', sql: 'sql', markdown: 'md', md: 'md',
+};
+
+// 通常のコードブロック (mermaid / matplotlib 以外) の描画結果を,
+// Copy / Download ボタン付きのツールバーで包む.
+// ボタン自体のクリック処理は markdown 本文に <script> を書いても marp-core にエスケープされてしまうため,
+// render() 側で HTML 文字列に直接スクリプトを追記する方式にしている (CODE_TOOLBAR_SCRIPT を参照).
+function wrapWithCodeToolbar(renderedHtml, lang) {
+  const ext = LANG_EXT_MAP[lang] || 'txt';
+  return `<div class="code-block-wrap"><div class="code-toolbar">`
+    + `<button type="button" class="code-copy-btn">Copy</button>`
+    + `<button type="button" class="code-download-btn" data-ext="${ext}">Download</button>`
+    + `</div>${renderedHtml}</div>`;
+}
+
+// コードブロックの Copy / Download ボタンを動作させるクライアントスクリプト.
+// HTML 出力 (out/htmls) でのみ意味を持つ. PDF 出力では @media print でボタンごと非表示にする.
+const CODE_TOOLBAR_SCRIPT = `<script>
+(function () {
+  // ボタンのラベルを一時的に差し替えて完了を伝える (Copy / Download 共通).
+  function showFeedback(btn, label) {
+    var original = btn.textContent;
+    btn.textContent = label;
+    btn.classList.add('copied');
+    setTimeout(function () {
+      btn.textContent = original;
+      btn.classList.remove('copied');
+    }, 500);
+  }
+
+  function copyText(text, btn) {
+    function onSuccess() {
+      showFeedback(btn, 'Copied!');
+    }
+    function fallbackCopy() {
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        onSuccess();
+      } catch (err) {
+        console.error('コピーに失敗しました', err);
+      }
+      document.body.removeChild(textarea);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess, fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+  }
+
+  function downloadText(text, filename, btn) {
+    var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showFeedback(btn, 'Downloaded!');
+  }
+
+  document.querySelectorAll('.code-block-wrap').forEach(function (wrap, index) {
+    var code = wrap.querySelector('code');
+    if (!code) return;
+    var text = code.innerText;
+
+    var copyBtn = wrap.querySelector('.code-copy-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function () {
+        copyText(text, copyBtn);
+      });
+    }
+
+    var downloadBtn = wrap.querySelector('.code-download-btn');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', function () {
+        var ext = downloadBtn.dataset.ext || 'txt';
+        downloadText(text, 'snippet-' + (index + 1) + '.' + ext, downloadBtn);
+      });
+    }
+  });
+})();
+</script>`;
+
 // Marp のコアクラスを継承し, コードブロックのレンダラーを上書きする.
 class MarpWithMermaid extends Marp {
   constructor(opts) {
@@ -144,7 +240,8 @@ class MarpWithMermaid extends Marp {
       const lang = token.info.trim().split(/\s/)[0];
       if (lang === 'mermaid') return renderMermaid(token.content.trim());
       if (lang === 'matplotlib') return renderMatplotlib(token.content.trim());
-      return orig ? orig(tokens, idx, options, env, self) : self.renderToken(tokens, idx, options);
+      const rendered = orig ? orig(tokens, idx, options, env, self) : self.renderToken(tokens, idx, options);
+      return wrapWithCodeToolbar(rendered, lang);
     };
   }
 
@@ -156,6 +253,10 @@ class MarpWithMermaid extends Marp {
       const embedded = embedImage(path, PROJECT_ROOT);
       return embedded === path ? match : `url(${q}${embedded}${q})`;
     });
+    // コードブロックのボタン用スクリプトを追記する.
+    // markdown 本文に直接 <script> を書くと marp-core にエスケープされて実行されないため,
+    // レンダリング後の HTML 文字列に直接追記する (この経路なら実行される).
+    result.html += CODE_TOOLBAR_SCRIPT;
     return result;
   }
 }

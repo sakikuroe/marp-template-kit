@@ -358,6 +358,50 @@ section pre code {
   background: transparent !important;
 }
 
+/* ===== コードブロックの Copy / Download ボタン =====
+   engine.mjs の fence レンダラーが <pre> を .code-block-wrap で包み,
+   ツールバー (.code-toolbar 内の 2 ボタン) を追加している.
+   ボタンの実処理 (クリックイベント) も engine.mjs が生成する <script> で行う. */
+
+/* .code-block-wrap は pre の位置決めコンテキスト.
+   ツールバーを pre の右上角に重ねて配置するための relative. */
+section .code-block-wrap {
+  position: relative;
+}
+
+/* HTML 出力でのみ意味を持つ (PDF はボタンが機能しないため印刷時は非表示にする). */
+section .code-toolbar {
+  position: absolute;
+  top: -27px;
+  right: 24px;
+  display: flex;
+  gap: 12px;
+  z-index: 1;
+}
+
+@media print {
+  section .code-toolbar {
+    display: none;
+  }
+}
+
+section .code-toolbar button {
+  font-family: "Zen Kaku Gothic New", "Noto Sans CJK JP";
+  font-size: 30px;
+  line-height: 1;
+  padding: 12px 24px;
+  border: 5px solid var(--ink);
+  border-radius: 0;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+section .code-toolbar button.copied {
+  background: var(--ink);
+  color: #fff;
+}
+
 /* インライン画像をデフォルトで中央揃えにする.
    bg 画像は CSS background-image に変換されるため影響しない.
    .emoji は Marp が絵文字を変換した <img> なのでインライン表示を維持する. */
@@ -422,8 +466,10 @@ section>.cols {
   font-size: calc(var(--body-scale) * 1em);
 }
 
-/* コードブロックは本文の 75% のサイズにする. */
-section>pre {
+/* コードブロックは本文の 75% のサイズにする.
+   engine.mjs が <pre> を .code-block-wrap で包むため, section の直接の子は
+   .code-block-wrap になる. font-size は子孫の pre にも継承されるので併記は不要. */
+section>.code-block-wrap {
   font-size: calc(var(--body-scale) * 0.75em);
 }
 
