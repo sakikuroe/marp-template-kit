@@ -359,9 +359,14 @@ section pre {
   box-shadow: var(--card-flat-shadow);
 }
 
-/* pre 内の code 要素が持つ背景色もリセットする. */
+/* pre 内の code 要素が持つ背景色もリセットする.
+   default テーマの white-space: pre (折り返しなし) だと長い行が枠の外にはみ出すため,
+   pre-wrap で枠内に折り返す. 折り返した2行目以降が元の行の続きか新しい行かは区別しない
+   (行番号を持たない設計のため, 割り切ってシンプルにしている). */
 section pre code {
   background: transparent !important;
+  white-space: pre-wrap !important;
+  word-break: break-word;
 }
 
 /* ===== コードブロックの Copy / Download ボタン =====
