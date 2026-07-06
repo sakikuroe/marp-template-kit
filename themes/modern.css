@@ -23,9 +23,10 @@ section {
     0 3px 6px -2px hsl(225 30% 24% / 0.07),
     0 10px 18px -6px hsl(225 34% 34% / 0.075),
     0 28px 48px -18px hsl(225 52% 42% / 0.10);
-  /* カードのシャドウ. 右下にオフセットした長方形の影. */
+  /* コードブロックのシャドウ (ベタ・オフセット).
+     blur 0 で --ink 単色を右下にずらすことで, 紙が奥に重なったような表現にする. */
   --card-flat-shadow:
-    24px 24px 0 0 hsl(225 28% 18% / 0.08);
+    12px 6px 0 0 var(--ink);
 
   /* --- 背景定数 --- */
   /* グリッド線の色. 不透明な固定色を使うことで, 2 層のグラデーションが交差点で重なっても
@@ -42,6 +43,8 @@ section {
   --link: #4a7a96;
   --decoration-shadow: drop-shadow(12px 10px 2px rgba(0, 0, 0, 0.09));
   --rail-divider: rgba(24, 20, 16, 0.45);
+  /* コードブロックの枠・影に使う「インク」色. ベタ・オフセットデザインで枠と影を同色にする. */
+  --ink: var(--text);
 
   /* --- 本文スケーリング ---
      使い方: スライド内に <style scoped> section { --body-scale: 0.8; } </style> と書くと
@@ -65,16 +68,19 @@ section {
   font-weight: 400;
   src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Regular.ttf");
 }
+
 @font-face {
   font-family: "Zen Kaku Gothic New";
   font-weight: 500;
   src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Medium.ttf");
 }
+
 @font-face {
   font-family: "Zen Kaku Gothic New";
   font-weight: 700;
   src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Bold.ttf");
 }
+
 @font-face {
   font-family: "Zen Kaku Gothic New";
   font-weight: 900;
@@ -236,6 +242,12 @@ pre {
   font-family: "Rounded Mgen+ 1m";
 }
 
+/* インラインコードのピルのパディングを default テーマ (.2em .4em) から変更する.
+   pre>code は default テーマ側で padding:0 (specificity 上位) になっているため影響しない. */
+section code {
+  padding: .05em .4em;
+}
+
 /* 罫線文字 (╭ ─ ┬ │) が行間で分断されないよう, グリフ (1em) が行ボックスを埋める値にする.
    section の line-height 1.75 を継承すると縦罫線が途切れる. */
 pre {
@@ -328,19 +340,15 @@ section thead th {
   border-bottom: 3px solid currentColor !important;
 }
 
-/* コードブロック (<pre>) を「薄い全体枠 + 四隅の太い角線」デザインにする.
-   default テーマの背景色・枠・角丸をリセットし, カスタムデザインを適用する.
-   CSS 変数で角線のサイズ・太さ・色を一括管理する. 全数値は 3x キャンバス基準.
-   --corner-size: 角線の長さ (元 20px → 60px)
-   --corner-line: 角線の太さ (元 3px → 9px)
-   薄い全体枠: border 5px (視覚 約1.67px).
-   9px の角線の中央に 5px の枠線が通るよう inset: -7px (= border 5px + はみ出し 2px) で配置.
-   ::before = 4 隅の水平線, ::after = 4 隅の垂直線.
-   注: CSS グラデーションは border-radius を持てないため角線の端は直角になる. */
+/* コードブロック (<pre>) を「ベタ・オフセット」デザインにする.
+   default テーマの背景色・枠・角丸をリセットし, 印刷物・リソグラフのような
+   ぼかしゼロの重なり表現を適用する. 全数値は 3x キャンバス基準.
+   枠 (border) と影 (box-shadow) を同じ --ink 色で揃え, 影は blur 0 でベタ塗りにする.
+   具体的な太さ・オフセット量は border と --card-flat-shadow の値を直接参照すること. */
 section pre {
   position: relative;
   overflow: visible !important;
-  border: 5px solid #aaa !important;
+  border: 5px solid var(--ink) !important;
   border-radius: 0 !important;
   background-color: transparent !important;
   backdrop-filter: blur(1px);
@@ -348,44 +356,61 @@ section pre {
   margin-top: 1em !important;
   margin-bottom: 1.5em !important;
 
-  --corner-size: 60px;
-  --corner-line: 9px;
-  --corner-color: #4d4d4d;
-
   box-shadow: var(--card-flat-shadow);
 }
 
-section pre::before,
-section pre::after {
-  content: '';
-  position: absolute;
-  /* border の内縁から -7px (= border 5px + 中央揃えはみ出し 2px) で外縁に合わせる.
-     9px の角線を 5px の枠線に中央揃えするために必要なオフセット. */
-  inset: -7px;
-  pointer-events: none;
-}
-
-/* 4 隅の水平角線 */
-section pre::before {
-  background:
-    linear-gradient(var(--corner-color), var(--corner-color)) top 0 left 0 / var(--corner-size) var(--corner-line) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) top 0 right 0 / var(--corner-size) var(--corner-line) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) bottom 0 left 0 / var(--corner-size) var(--corner-line) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) bottom 0 right 0 / var(--corner-size) var(--corner-line) no-repeat;
-}
-
-/* 4 隅の垂直角線 */
-section pre::after {
-  background:
-    linear-gradient(var(--corner-color), var(--corner-color)) top 0 left 0 / var(--corner-line) var(--corner-size) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) top 0 right 0 / var(--corner-line) var(--corner-size) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) bottom 0 left 0 / var(--corner-line) var(--corner-size) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) bottom 0 right 0 / var(--corner-line) var(--corner-size) no-repeat;
-}
-
-/* pre 内の code 要素が持つ背景色もリセットする. */
+/* pre 内の code 要素が持つ背景色もリセットする.
+   default テーマの white-space: pre (折り返しなし) だと長い行が枠の外にはみ出すため,
+   pre-wrap で枠内に折り返す. 折り返した2行目以降が元の行の続きか新しい行かは区別しない
+   (行番号を持たない設計のため, 割り切ってシンプルにしている). */
 section pre code {
   background: transparent !important;
+  white-space: pre-wrap !important;
+  word-break: break-word;
+}
+
+/* ===== コードブロックの Copy / Download ボタン =====
+   engine.mjs の fence レンダラーが <pre> を .code-block-wrap で包み,
+   ツールバー (.code-toolbar 内の 2 ボタン) を追加している.
+   ボタンの実処理 (クリックイベント) も engine.mjs が生成する <script> で行う. */
+
+/* .code-block-wrap は pre の位置決めコンテキスト.
+   ツールバーを pre の右上角に重ねて配置するための relative. */
+section .code-block-wrap {
+  position: relative;
+}
+
+/* HTML 出力でのみ意味を持つ (PDF はボタンが機能しないため印刷時は非表示にする). */
+section .code-toolbar {
+  position: absolute;
+  top: -27px;
+  right: 24px;
+  display: flex;
+  gap: 12px;
+  z-index: 1;
+}
+
+@media print {
+  section .code-toolbar {
+    display: none;
+  }
+}
+
+section .code-toolbar button {
+  font-family: "Zen Kaku Gothic New", "Noto Sans CJK JP";
+  font-size: 30px;
+  line-height: 1;
+  padding: 12px 24px;
+  border: 5px solid var(--ink);
+  border-radius: 0;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+section .code-toolbar button.copied {
+  background: var(--ink);
+  color: #fff;
 }
 
 /* インライン画像をデフォルトで中央揃えにする.
@@ -452,8 +477,10 @@ section>.cols {
   font-size: calc(var(--body-scale) * 1em);
 }
 
-/* コードブロックは本文の 75% のサイズにする. */
-section>pre {
+/* コードブロックは本文の 75% のサイズにする.
+   engine.mjs が <pre> を .code-block-wrap で包むため, section の直接の子は
+   .code-block-wrap になる. font-size は子孫の pre にも継承されるので併記は不要. */
+section>.code-block-wrap {
   font-size: calc(var(--body-scale) * 0.75em);
 }
 
