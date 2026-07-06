@@ -242,6 +242,12 @@ pre {
   font-family: "Rounded Mgen+ 1m";
 }
 
+/* インラインコードのピルのパディングを default テーマ (.2em .4em) から変更する.
+   pre>code は default テーマ側で padding:0 (specificity 上位) になっているため影響しない. */
+section code {
+  padding: .05em .4em;
+}
+
 /* 罫線文字 (╭ ─ ┬ │) が行間で分断されないよう, グリフ (1em) が行ボックスを埋める値にする.
    section の line-height 1.75 を継承すると縦罫線が途切れる. */
 pre {
