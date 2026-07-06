@@ -23,9 +23,10 @@ section {
     0 3px 6px -2px hsl(225 30% 24% / 0.07),
     0 10px 18px -6px hsl(225 34% 34% / 0.075),
     0 28px 48px -18px hsl(225 52% 42% / 0.10);
-  /* カードのシャドウ. 右下にオフセットした長方形の影. */
+  /* コードブロックのシャドウ (ベタ・オフセット).
+     blur 0 で --ink 単色を右下にずらすことで, 紙が奥に重なったような表現にする. */
   --card-flat-shadow:
-    24px 24px 0 0 hsl(225 28% 18% / 0.08);
+    12px 6px 0 0 var(--ink);
 
   /* --- 背景定数 --- */
   /* グリッド線の色. 不透明な固定色を使うことで, 2 層のグラデーションが交差点で重なっても
@@ -42,6 +43,8 @@ section {
   --link: #4a7a96;
   --decoration-shadow: drop-shadow(12px 10px 2px rgba(0, 0, 0, 0.09));
   --rail-divider: rgba(24, 20, 16, 0.45);
+  /* コードブロックの枠・影に使う「インク」色. ベタ・オフセットデザインで枠と影を同色にする. */
+  --ink: var(--text);
 
   /* --- 本文スケーリング ---
      使い方: スライド内に <style scoped> section { --body-scale: 0.8; } </style> と書くと
@@ -65,16 +68,19 @@ section {
   font-weight: 400;
   src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Regular.ttf");
 }
+
 @font-face {
   font-family: "Zen Kaku Gothic New";
   font-weight: 500;
   src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Medium.ttf");
 }
+
 @font-face {
   font-family: "Zen Kaku Gothic New";
   font-weight: 700;
   src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Bold.ttf");
 }
+
 @font-face {
   font-family: "Zen Kaku Gothic New";
   font-weight: 900;
@@ -328,19 +334,15 @@ section thead th {
   border-bottom: 3px solid currentColor !important;
 }
 
-/* コードブロック (<pre>) を「薄い全体枠 + 四隅の太い角線」デザインにする.
-   default テーマの背景色・枠・角丸をリセットし, カスタムデザインを適用する.
-   CSS 変数で角線のサイズ・太さ・色を一括管理する. 全数値は 3x キャンバス基準.
-   --corner-size: 角線の長さ (元 20px → 60px)
-   --corner-line: 角線の太さ (元 3px → 9px)
-   薄い全体枠: border 5px (視覚 約1.67px).
-   9px の角線の中央に 5px の枠線が通るよう inset: -7px (= border 5px + はみ出し 2px) で配置.
-   ::before = 4 隅の水平線, ::after = 4 隅の垂直線.
-   注: CSS グラデーションは border-radius を持てないため角線の端は直角になる. */
+/* コードブロック (<pre>) を「ベタ・オフセット」デザインにする.
+   default テーマの背景色・枠・角丸をリセットし, 印刷物・リソグラフのような
+   ぼかしゼロの重なり表現を適用する. 全数値は 3x キャンバス基準.
+   枠 (border) と影 (box-shadow) を同じ --ink 色で揃え, 影は blur 0 でベタ塗りにする.
+   具体的な太さ・オフセット量は border と --card-flat-shadow の値を直接参照すること. */
 section pre {
   position: relative;
   overflow: visible !important;
-  border: 5px solid #aaa !important;
+  border: 5px solid var(--ink) !important;
   border-radius: 0 !important;
   background-color: transparent !important;
   backdrop-filter: blur(1px);
@@ -348,39 +350,7 @@ section pre {
   margin-top: 1em !important;
   margin-bottom: 1.5em !important;
 
-  --corner-size: 60px;
-  --corner-line: 9px;
-  --corner-color: #4d4d4d;
-
   box-shadow: var(--card-flat-shadow);
-}
-
-section pre::before,
-section pre::after {
-  content: '';
-  position: absolute;
-  /* border の内縁から -7px (= border 5px + 中央揃えはみ出し 2px) で外縁に合わせる.
-     9px の角線を 5px の枠線に中央揃えするために必要なオフセット. */
-  inset: -7px;
-  pointer-events: none;
-}
-
-/* 4 隅の水平角線 */
-section pre::before {
-  background:
-    linear-gradient(var(--corner-color), var(--corner-color)) top 0 left 0 / var(--corner-size) var(--corner-line) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) top 0 right 0 / var(--corner-size) var(--corner-line) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) bottom 0 left 0 / var(--corner-size) var(--corner-line) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) bottom 0 right 0 / var(--corner-size) var(--corner-line) no-repeat;
-}
-
-/* 4 隅の垂直角線 */
-section pre::after {
-  background:
-    linear-gradient(var(--corner-color), var(--corner-color)) top 0 left 0 / var(--corner-line) var(--corner-size) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) top 0 right 0 / var(--corner-line) var(--corner-size) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) bottom 0 left 0 / var(--corner-line) var(--corner-size) no-repeat,
-    linear-gradient(var(--corner-color), var(--corner-color)) bottom 0 right 0 / var(--corner-line) var(--corner-size) no-repeat;
 }
 
 /* pre 内の code 要素が持つ背景色もリセットする. */
