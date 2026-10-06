@@ -36,56 +36,15 @@ RUN set -eu; \
     wget -q -O /tmp/genei-m-gothic.zip https://okoneya.jp/font/GenEiMGothic_v2.0.zip; \
     unzip -q /tmp/genei-m-gothic.zip -d "$font_root/genei-m-gothic"; \
     rm /tmp/genei-m-gothic.zip; \
-    fc-cache -f
-
-# フォントのライセンスはプロジェクトの MIT License と別に保持する。
-RUN set -eu; \
-    notices=/usr/share/doc/marp-template-kit/font-licenses; \
-    mkdir -p "$notices"; \
-    wget -q -O "$notices/Rounded-Noto-Code-OFL.txt" \
+    licenses=/usr/share/doc/marp-template-kit/font-licenses; \
+    mkdir -p "$licenses"; \
+    cp "$font_root/genei-m-gothic/GenEiMGothic_v2.0/OFLicense.txt" "$licenses/GenEi-M-Gothic-OFL.txt"; \
+    wget -q -O "$licenses/Rounded-Noto-Code-OFL.txt" \
         https://raw.githubusercontent.com/sakikuroe/rounded-noto-sans-cjk/v0.2.0/licenses/OFL.txt; \
-    wget -q -O "$notices/Noto-Sans-JP-OFL.txt" \
+    wget -q -O "$licenses/Noto-Sans-JP-OFL.txt" \
         https://raw.githubusercontent.com/google/fonts/295d98a7a0c17c68f1341eaeea354e7960ea70d3/ofl/notosansjp/OFL.txt; \
-    cp /usr/share/fonts/truetype/slide-previews/ibmplexsansjp/OFL.txt "$notices/IBM-Plex-Sans-JP-OFL.txt"; \
-    cp /usr/share/fonts/truetype/slide-previews/genei-m-gothic/GenEiMGothic_v2.0/OFLicense.txt "$notices/GenEi-M-Gothic-OFL.txt"; \
-    cp /usr/share/doc/fonts-noto-cjk/copyright "$notices/Noto-CJK-copyright.txt"
-
-# Rounded Noto の元フォントの著作権・商標表示は name テーブルにある。
-# 配布元の文書とともに UTF-8 の一覧へ残し、フォント本体は変更しない。
-RUN node -e '\
-    const fs = require("node:fs"); \
-    const root = "/usr/share/doc/marp-template-kit/font-licenses"; \
-    const sections = []; \
-    for (const weight of ["Regular", "Bold"]) { \
-        const name = `RoundedNotoCodeCJKJP-${weight}.otf`; \
-        const font = fs.readFileSync(`/usr/share/fonts/opentype/rounded-noto-code/${name}`); \
-        let offset; \
-        for (let i = 0; i < font.readUInt16BE(4); i++) { \
-            const record = 12 + i * 16; \
-            if (font.toString("ascii", record, record + 4) === "name") offset = font.readUInt32BE(record + 8); \
-        } \
-        if (offset === undefined) throw new Error(`Missing font names: ${name}`); \
-        const strings = offset + font.readUInt16BE(offset + 4); \
-        const notices = new Set(); \
-        for (let i = 0; i < font.readUInt16BE(offset + 2); i++) { \
-            const record = offset + 6 + i * 12; \
-            const platform = font.readUInt16BE(record); \
-            const id = font.readUInt16BE(record + 6); \
-            if (![0, 7].includes(id) || ![0, 3].includes(platform)) continue; \
-            const start = strings + font.readUInt16BE(record + 10); \
-            const bytes = font.subarray(start, start + font.readUInt16BE(record + 8)); \
-            notices.add(new TextDecoder("utf-16be").decode(bytes)); \
-        } \
-        if (!notices.size) throw new Error(`Missing font copyright: ${name}`); \
-        sections.push(`${name}\n${[...notices].join("\n")}`); \
-    } \
-    for (const name of fs.readdirSync(root).sort()) { \
-        const encoding = name === "GenEi-M-Gothic-OFL.txt" ? "shift_jis" : "utf-8"; \
-        const text = new TextDecoder(encoding, { fatal: true }).decode(fs.readFileSync(`${root}/${name}`)); \
-        sections.push(`${name}\n${text}`); \
-    } \
-    fs.writeFileSync("/usr/share/doc/marp-template-kit/FONT-LICENSES.txt", \
-        "Font copyrights and licenses (separate from the project MIT License)\n\n" + sections.join("\n\n========================================\n\n")); \
-    '
+    cp "$font_root/ibmplexsansjp/OFL.txt" "$licenses/IBM-Plex-Sans-JP-OFL.txt"; \
+    cp /usr/share/doc/fonts-noto-cjk/copyright "$licenses/Noto-CJK-copyright.txt"; \
+    fc-cache -f
 
 WORKDIR /app

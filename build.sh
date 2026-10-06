@@ -46,7 +46,12 @@ podman run --rm --userns=keep-id --network=none \
     const path = require("node:path");
     const fontDir = "/app/.cache/fonts";
     fs.mkdirSync(fontDir, { recursive: true });
-    fs.copyFileSync("/usr/share/doc/marp-template-kit/FONT-LICENSES.txt", path.join(fontDir, "FONT-LICENSES.txt"));
+    const sourceLicenses = "/usr/share/doc/marp-template-kit/font-licenses";
+    const licenseDir = path.join(fontDir, "licenses");
+    fs.mkdirSync(licenseDir, { recursive: true });
+    for (const name of fs.readdirSync(sourceLicenses)) {
+      fs.copyFileSync(path.join(sourceLicenses, name), path.join(licenseDir, name));
+    }
     const mime = { ".ttf": "font/ttf", ".otf": "font/otf", ".png": "image/png" };
     const urls = /url\(([\x27\x22]?)([^\x27\x22)]+)\1\)/g;
     const faces = [];
