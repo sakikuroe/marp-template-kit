@@ -1,5 +1,8 @@
 {
   "markdown.marp.themes": [
-    "./themes/modern.css"
+    "./.cache/modern-preview.css"
+  ],
+  "markdown.styles": [
+    "./.cache/fonts/fonts.css"
   ]
 }
