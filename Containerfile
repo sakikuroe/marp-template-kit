@@ -1,40 +1,41 @@
 FROM docker.io/marpteam/marp-cli:v4.3.1
 
-# "Rounded Mgen+ 1m" 配布元 (罫線文字を含む記号を等幅グリフとして収録した等幅フォント).
-ARG ROUNDED_MGENPLUS_URL=https://ftp.iij.ad.jp/pub/osdn.jp/users/8/8598/rounded-mgenplus-20150602.7z
-ARG ROUNDED_MGENPLUS_TTF_NAME=rounded-mgenplus-1m-regular.ttf
-
-# "Zen Kaku Gothic New" 配布元 (google/fonts リポジトリー).
-# 実行時に Google Fonts (fonts.googleapis.com) へ接続する @import ではなく,
-# ビルド時にコンテナへ同梱することで, 生成 HTML を自己完結させる.
-ARG ZEN_KAKU_BASE_URL=https://raw.githubusercontent.com/google/fonts/main/ofl/zenkakugothicnew
-
-# Ambiguous width グリフ半角化パッチ (詳細は patch_ambiguous_width.py を参照).
-COPY patch_ambiguous_width.py /tmp/patch_ambiguous_width.py
+ARG ROUNDED_NOTO_BASE_URL=https://github.com/sakikuroe/rounded-noto-sans-cjk/releases/download/v0.2.0
+ARG NOTO_SANS_JP_URL=https://raw.githubusercontent.com/google/fonts/295d98a7a0c17c68f1341eaeea354e7960ea70d3/ofl/notosansjp/NotoSansJP%5Bwght%5D.ttf
+ARG IBM_PLEX_SANS_JP_BASE_URL=https://raw.githubusercontent.com/google/fonts/9710da1eacb3be272583c3224dcb70f9da6eadbb/ofl/ibmplexsansjp
 
 RUN apt-get update && \
-    apt-get install -y wget python3 python3-pip fonts-noto-cjk p7zip-full && \
+    apt-get install -y wget python3 python3-pip fonts-noto-cjk unzip && \
     wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
     apt-get install -y /tmp/chrome.deb && \
     rm /tmp/chrome.deb && \
-    pip install img2pdf matplotlib fonttools --no-cache-dir --break-system-packages && \
-    PUPPETEER_SKIP_DOWNLOAD=1 npm install -g @mermaid-js/mermaid-cli && \
-    wget -q -O /tmp/rounded-mgenplus.7z "$ROUNDED_MGENPLUS_URL" && \
-    mkdir -p /tmp/rounded-mgenplus && \
-    7zr x -y /tmp/rounded-mgenplus.7z -o/tmp/rounded-mgenplus >/dev/null && \
-    mkdir -p /usr/share/fonts/truetype/rounded-mgenplus && \
-    find /tmp/rounded-mgenplus -type f -name "$ROUNDED_MGENPLUS_TTF_NAME" \
-        -exec python3 /tmp/patch_ambiguous_width.py {} \
-        "/usr/share/fonts/truetype/rounded-mgenplus/$ROUNDED_MGENPLUS_TTF_NAME" \; && \
-    fc-cache -f /usr/share/fonts/truetype/rounded-mgenplus && \
-    rm -rf /tmp/rounded-mgenplus /tmp/rounded-mgenplus.7z /tmp/patch_ambiguous_width.py && \
-    mkdir -p /usr/share/fonts/truetype/zen-kaku-gothic-new && \
-    for w in Regular Medium Bold Black; do \
-        wget -q -O "/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-${w}.ttf" \
-            "$ZEN_KAKU_BASE_URL/ZenKakuGothicNew-${w}.ttf"; \
-    done && \
-    fc-cache -f /usr/share/fonts/truetype/zen-kaku-gothic-new && \
-    apt-get remove -y p7zip-full && \
+    pip install img2pdf matplotlib --no-cache-dir --break-system-packages && \
+    PUPPETEER_SKIP_DOWNLOAD=1 npm install -g @mermaid-js/mermaid-cli@11.16.0 && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# 比較用の Noto Sans JP と、コード用の Rounded Noto Code CJK JP。
+RUN mkdir -p /usr/share/fonts/truetype/noto-sans-jp /usr/share/fonts/opentype/rounded-noto-code && \
+    wget -q -O /usr/share/fonts/truetype/noto-sans-jp/NotoSansJP-Variable.ttf "$NOTO_SANS_JP_URL" && \
+    wget -q -O /usr/share/fonts/opentype/rounded-noto-code/RoundedNotoCodeCJKJP-Regular.otf \
+        "$ROUNDED_NOTO_BASE_URL/RoundedNotoCodeCJKJP-Regular.otf" && \
+    wget -q -O /usr/share/fonts/opentype/rounded-noto-code/RoundedNotoCodeCJKJP-Bold.otf \
+        "$ROUNDED_NOTO_BASE_URL/RoundedNotoCodeCJKJP-Bold.otf" && \
+    echo "d167d63ba1a419fc2123e623212ce50ea97fe115b846a2ecd933532e4dc6c12a  /usr/share/fonts/opentype/rounded-noto-code/RoundedNotoCodeCJKJP-Regular.otf" | sha256sum -c - && \
+    echo "d0d411f0ebb5d8cdb3495bf160419ce88fe5195dc998771f5905ca88effc996b  /usr/share/fonts/opentype/rounded-noto-code/RoundedNotoCodeCJKJP-Bold.otf" | sha256sum -c - && \
+    fc-cache -f
+
+# 本文用の比較候補は IBM Plex Sans JP・源暎エムゴ・Noto Sans JP の3書体。
+RUN set -eu; \
+    font_root=/usr/share/fonts/truetype/slide-previews; \
+    mkdir -p "$font_root/ibmplexsansjp" "$font_root/genei-m-gothic"; \
+    wget -q -O "$font_root/ibmplexsansjp/OFL.txt" "$IBM_PLEX_SANS_JP_BASE_URL/OFL.txt"; \
+    for weight in Thin ExtraLight Light Regular Medium SemiBold Bold; do \
+        wget -q -O "$font_root/ibmplexsansjp/IBMPlexSansJP-$weight.ttf" \
+            "$IBM_PLEX_SANS_JP_BASE_URL/IBMPlexSansJP-$weight.ttf"; \
+    done; \
+    wget -q -O /tmp/genei-m-gothic.zip https://okoneya.jp/font/GenEiMGothic_v2.0.zip; \
+    unzip -q /tmp/genei-m-gothic.zip -d "$font_root/genei-m-gothic"; \
+    rm /tmp/genei-m-gothic.zip; \
+    fc-cache -f
 
 WORKDIR /app

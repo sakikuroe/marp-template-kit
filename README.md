@@ -57,18 +57,11 @@ theme: modern
 ./build.sh <Markdown ファイル>
 ```
 
-HTML と PDF (`backdrop-filter` 対応, PNG 経由で変換) が生成されます.
-
-### 使用イメージの変更
-
-デフォルトは `docker.io/marpteam/marp-cli:v4.3.1` です. `MARP_IMAGE` 環境変数で上書きできます.
-
-```bash
-MARP_IMAGE=docker.io/marpteam/marp-cli:latest ./build.sh <Markdown ファイル>
-```
+HTML, 文字を選択できる PDF (`out/pdfs/`), 画像ベースの PDF (`out/png_pdfs/`) が生成されます.
+`backdrop-filter` の見た目を含めて確認する場合は, PNG 経由で変換した画像ベースの PDF を使用します.
 
 ### 注意
 
-- PDF: ビルド時にコンテナ内の Chromium が Google Fonts を取得するため, ネットワーク接続が必要です.
-- HTML: ビルド時のネットワーク接続は不要です. ブラウザで開く際にフォントが読み込まれます.
+- コンテナイメージの初回構築には, 依存関係とフォントを取得するためネットワーク接続が必要です.
+- フォントは生成 HTML に埋め込まれるため, 閲覧時に外部から取得する必要はありません.
 - git clone で取得した場合, 実行権限はすでに付与されています. 別の方法で取得した場合は `chmod +x build.sh` を実行してください.

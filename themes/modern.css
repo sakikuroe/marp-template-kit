@@ -57,38 +57,27 @@ section {
    Chromium は border-width を整数 px に切り捨てるため CSS 上の 1.5px を表現できない.
    キャンバスを 3 倍にして 5px/3px で描画し, 33% 縮小表示時に視覚上 約1.67px/1px に見せる.
    font-size・padding も 3 倍にしてレイアウト比率を維持する.
-   すべてのスライドのフォントを Zen Kaku Gothic New に設定する.
+   すべてのスライドのフォントを GenEi M Gothic v2 に設定する.
    フォールバックには Noto Sans CJK JP (コンテナにインストール済み) を指定する. */
 
-/* Zen Kaku Gothic New はコンテナ内にビルド時に同梱している (Google Fonts の @import は使わない).
-   engine.mjs が url() を base64 data URI に変換して HTML に埋め込むため,
-   閲覧マシンにフォントがなくても, ビルド時にもネットワーク接続なしで同一表示になる. */
+/* GenEi M Gothic v2 の実ウェイトをコンテナ内にインストールする.
+   engine.mjs がフォントを HTML に埋め込む. */
 @font-face {
-  font-family: "Zen Kaku Gothic New";
+  font-family: "GenEi M Gothic v2";
   font-weight: 400;
-  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Regular.ttf");
+  src: url("/usr/share/fonts/truetype/slide-previews/genei-m-gothic/GenEiMGothic_v2.0/GenEiMGothic2-Regular.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: "Zen Kaku Gothic New";
+  font-family: "GenEi M Gothic v2";
   font-weight: 500;
-  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Medium.ttf");
-}
-
-@font-face {
-  font-family: "Zen Kaku Gothic New";
-  font-weight: 700;
-  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Bold.ttf");
-}
-
-@font-face {
-  font-family: "Zen Kaku Gothic New";
-  font-weight: 900;
-  src: url("/usr/share/fonts/truetype/zen-kaku-gothic-new/ZenKakuGothicNew-Black.ttf");
+  src: url("/usr/share/fonts/truetype/slide-previews/genei-m-gothic/GenEiMGothic_v2.0/GenEiMGothic2-Medium.ttf") format("truetype");
 }
 
 section {
-  font-family: "Zen Kaku Gothic New", "Noto Sans CJK JP";
+  font-family: "GenEi M Gothic v2", "Noto Sans CJK JP";
+  font-weight: 400;
+  font-synthesis: none;
   width: 3840px;
   height: 2160px;
   font-size: 87px;
@@ -128,7 +117,7 @@ section header {
   top: auto;
   width: 1900px;
   font-size: 36px;
-  font-weight: normal;
+  font-weight: 400;
   white-space: nowrap;
   text-align: left;
   transform-origin: 0 100%;
@@ -230,8 +219,15 @@ section strong {
    engine.mjs が url() を base64 data URI に変換して HTML に埋め込むため,
    閲覧マシンにフォントがなくても同一表示になる. */
 @font-face {
-  font-family: "Rounded Mgen+ 1m";
-  src: url("/usr/share/fonts/truetype/rounded-mgenplus/rounded-mgenplus-1m-regular.ttf");
+  font-family: "Rounded Noto Code CJK JP";
+  font-weight: 400;
+  src: url("/usr/share/fonts/opentype/rounded-noto-code/RoundedNotoCodeCJKJP-Regular.otf");
+}
+
+@font-face {
+  font-family: "Rounded Noto Code CJK JP";
+  font-weight: 700;
+  src: url("/usr/share/fonts/opentype/rounded-noto-code/RoundedNotoCodeCJKJP-Bold.otf");
 }
 
 /* インラインコード (`code`) とコードブロック (<pre> 内の <code>) は
@@ -239,7 +235,7 @@ section strong {
    section に指定したフォントがそのまま継承されてしまうため, ここで明示的に戻している. */
 code,
 pre {
-  font-family: "Rounded Mgen+ 1m";
+  font-family: "Rounded Noto Code CJK JP";
 }
 
 /* インラインコードのピルのパディングを default テーマ (.2em .4em) から変更する.
@@ -397,7 +393,7 @@ section .code-toolbar {
 }
 
 section .code-toolbar button {
-  font-family: "Zen Kaku Gothic New", "Noto Sans CJK JP";
+  font-family: "GenEi M Gothic v2", "Noto Sans CJK JP";
   font-size: 30px;
   line-height: 1;
   padding: 12px 24px;
@@ -570,11 +566,13 @@ section.section {
   background-image: var(--paper-bg);
 }
 
-/* セクション番号: 大きく左に配置する. */
+/* セクション番号: 大きく左に配置する.
+   default テーマ由来の下余白を除き, 数字の字形を上下中央に合わせる.
+   源暎エムゴ Medium・448px は字形の中心が行ボックスの中心より約9px下にある. */
 section.section>h1 {
   position: absolute;
   left: 384px;
-  top: calc(50% + 30px);
+  top: calc(50% - 9px);
   transform: translateY(-50%);
   font-size: 448px;
   line-height: 1;
@@ -583,15 +581,16 @@ section.section>h1 {
   opacity: 0.82;
   letter-spacing: -16px;
   margin: 0;
-  padding-left: 0;
+  padding: 0;
 }
 
-/* メイン見出し: 横線を含む全体を縦方向中央に配置する.
+/* メイン見出し: 横線を含む全体を縦方向中央から8px下に配置する.
+   1920×1080表示では4pxの補正になる.
    実際の高さを基準にするため, 1〜3 行の見出しでも位置の個別調整は不要. */
 section.section>h3 {
   position: absolute;
   left: 1040px;
-  top: 50%;
+  top: calc(50% + 8px);
   transform: translateY(-50%);
   right: 700px;
   font-size: 156px;
@@ -771,4 +770,19 @@ section.section>h3::after {
 .card>ul+p,
 .card>ol+p {
   margin-top: 24px;
+}
+
+/* 共通ウェイト: GenEi M Gothic v2 の本文は400、見出し・章番号・強調は500。
+   コードのフォントと太さは従来の設定を維持する。 */
+section,
+section::before,
+section::after,
+section :where(:not(code):not(pre):not(code *):not(pre *)) {
+  font-weight: 400 !important;
+}
+
+section :is(h1, h2, h3, h4, h5, h6, strong, b, th, .card>p:first-child),
+section :is(h1, h2, h3, h4, h5, h6, strong, b, th, .card>p:first-child)
+  :where(:not(code):not(pre):not(code *):not(pre *)) {
+  font-weight: 500 !important;
 }

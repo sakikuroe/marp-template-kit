@@ -22,13 +22,19 @@ input_dir="$(dirname "$rel_input")"
 mkdir -p "$script_dir/out/htmls" "$script_dir/out/pdfs" "$script_dir/out/png_pdfs"
 
 image="localhost/marp-template-kit/tools"
+theme_path="/themes/modern.css"
 
 if ! podman info > /dev/null 2>&1; then
   echo "error: podman が利用できません. インストールと設定を確認してください." >&2
   exit 1
 fi
 
-podman build -q -t "$image" -f "$script_dir/Containerfile" "$script_dir" >&2
+if [ "${MARP_SKIP_IMAGE_BUILD:-0}" != 1 ]; then
+  podman build -q -t "$image" -f "$script_dir/Containerfile" "$script_dir" >&2
+elif ! podman image exists "$image"; then
+  echo "error: 既存イメージがありません. 最初に podman build を実行してください." >&2
+  exit 1
+fi
 
 mkdir -p "$script_dir/.cache"
 
@@ -44,7 +50,7 @@ _out=$(podman run --rm --init \
   --entrypoint node \
   "$image" /home/marp/.cli/marp-cli.js \
   "$rel_input" \
-  --theme-set /themes/modern.css \
+  --theme-set "$theme_path" \
   --engine /app/engine.mjs \
   -o "out/htmls/${base}.html" \
   --allow-local-files 2>&1) || { rc=$?; printf '%s\n' "$_out" >&2; exit "$rc"; }
@@ -84,7 +90,7 @@ _out=$(podman run --rm --init \
   --entrypoint node \
   "$image" /home/marp/.cli/marp-cli.js \
   "$rel_input" \
-  --theme-set /themes/modern.css \
+  --theme-set "$theme_path" \
   --engine /app/engine.mjs \
   --images png \
   -o ".cache/${base}.png" \
