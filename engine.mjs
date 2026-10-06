@@ -8,7 +8,7 @@ import { createRequire } from 'module';
 const require = createRequire('/home/marp/.cli/marp-cli.js');
 const { Marp } = require('@marp-team/marp-core');
 import { execSync } from 'child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { createHash } from 'crypto';
 import { join, resolve, extname } from 'path';
 
@@ -253,18 +253,9 @@ class MarpWithMermaid extends Marp {
       const embedded = embedImage(path, PROJECT_ROOT);
       return embedded === path ? match : `url(${q}${embedded}${q})`;
     });
-    // 自己完結 HTML 内に含めたフォントのライセンス情報を保持する。
+    // 自己完結 HTML に含まれるテーマの MIT License を保持する。
     const projectLicense = readFileSync('/app/LICENSE', 'utf8');
-    const licenseDir = '/usr/share/doc/marp-template-kit/font-licenses';
-    const fontLicenses = readdirSync(licenseDir).sort().map((name) => {
-      const license = readFileSync(join(licenseDir, name));
-      const text = name === 'GenEi-M-Gothic-OFL.txt'
-        ? new TextDecoder('shift_jis', { fatal: true }).decode(license)
-        : license.toString('utf8');
-      return `${name}\n${text}`;
-    }).join('\n\n');
-    const notices = `${projectLicense}\n${fontLicenses}`.replace(/\*\//g, '* /');
-    result.css = `/*! Project and font licenses\n${notices}\n*/\n${result.css}`;
+    result.css = `/*! MIT License\n${projectLicense}*/\n${result.css}`;
     // コードブロックのボタン用スクリプトを追記する.
     // markdown 本文に直接 <script> を書くと marp-core にエスケープされて実行されないため,
     // レンダリング後の HTML 文字列に直接追記する (この経路なら実行される).

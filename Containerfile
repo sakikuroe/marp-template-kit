@@ -36,15 +36,6 @@ RUN set -eu; \
     wget -q -O /tmp/genei-m-gothic.zip https://okoneya.jp/font/GenEiMGothic_v2.0.zip; \
     unzip -q /tmp/genei-m-gothic.zip -d "$font_root/genei-m-gothic"; \
     rm /tmp/genei-m-gothic.zip; \
-    licenses=/usr/share/doc/marp-template-kit/font-licenses; \
-    mkdir -p "$licenses"; \
-    cp "$font_root/genei-m-gothic/GenEiMGothic_v2.0/OFLicense.txt" "$licenses/GenEi-M-Gothic-OFL.txt"; \
-    wget -q -O "$licenses/Rounded-Noto-Code-OFL.txt" \
-        https://raw.githubusercontent.com/sakikuroe/rounded-noto-sans-cjk/v0.2.0/licenses/OFL.txt; \
-    wget -q -O "$licenses/Noto-Sans-JP-OFL.txt" \
-        https://raw.githubusercontent.com/google/fonts/295d98a7a0c17c68f1341eaeea354e7960ea70d3/ofl/notosansjp/OFL.txt; \
-    cp "$font_root/ibmplexsansjp/OFL.txt" "$licenses/IBM-Plex-Sans-JP-OFL.txt"; \
-    cp /usr/share/doc/fonts-noto-cjk/copyright "$licenses/Noto-CJK-copyright.txt"; \
     fc-cache -f
 
 WORKDIR /app
