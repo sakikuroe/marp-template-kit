@@ -253,6 +253,11 @@ class MarpWithMermaid extends Marp {
       const embedded = embedImage(path, PROJECT_ROOT);
       return embedded === path ? match : `url(${q}${embedded}${q})`;
     });
+    // 丸ごと埋め込んだフォントの著作権表示とライセンス全文を HTML 内に保持する。
+    // CSS コメントなので、画面表示・印刷・ページ数には影響しない。
+    const notices = 'Project license\n' + readFileSync('/app/LICENSE', 'utf8') + '\n\n'
+      + readFileSync('/usr/share/doc/marp-template-kit/FONT-LICENSES.txt', 'utf8');
+    result.css = `/*!\n${notices.replace(/\*\//g, '* /').replace(/</g, '\\3c ')}\n*/\n${result.css}`;
     // コードブロックのボタン用スクリプトを追記する.
     // markdown 本文に直接 <script> を書くと marp-core にエスケープされて実行されないため,
     // レンダリング後の HTML 文字列に直接追記する (この経路なら実行される).
