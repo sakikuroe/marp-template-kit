@@ -65,3 +65,12 @@ HTML, 文字を選択できる PDF (`out/pdfs/`), 画像ベースの PDF (`out/p
 - コンテナイメージの初回構築には, 依存関係とフォントを取得するためネットワーク接続が必要です.
 - フォントは生成 HTML に埋め込まれるため, 閲覧時に外部から取得する必要はありません.
 - git clone で取得した場合, 実行権限はすでに付与されています. 別の方法で取得した場合は `chmod +x build.sh` を実行してください.
+
+## ライセンス
+
+本リポジトリのコード, テーマ, ドキュメント, サンプル, 画像およびアイコンは [MIT License](LICENSE) で公開しています.
+取得するフォントには各配布元のライセンスが適用され, 本リポジトリの MIT License には含まれません.
+
+- [源暎エムゴ](https://okoneya.jp/font/genei-m-gothic.html), [Rounded Noto Code](https://github.com/sakikuroe/rounded-noto-sans-cjk/tree/v0.2.0), Noto Sans JP / Noto CJK, IBM Plex Sans JP: SIL Open Font License 1.1.
+- 源暎エムゴと Rounded Noto Code は, 著作権表示・OFL 1.1 の宣言・ライセンスURLをフォント内に保持しています. VS Code用のコピーとHTMLへの埋め込みでは元のフォントをそのまま使い, この情報を維持します.
+- OFL フォントを使用して作成した PDF やスライド自体に, OFL を適用する必要はありません. 詳細は [OFL の公式 FAQ](https://openfontlicense.org/ofl-faq/) を参照してください.

@@ -253,6 +253,9 @@ class MarpWithMermaid extends Marp {
       const embedded = embedImage(path, PROJECT_ROOT);
       return embedded === path ? match : `url(${q}${embedded}${q})`;
     });
+    // 自己完結 HTML に含まれるテーマの MIT License を保持する。
+    const projectLicense = readFileSync('/app/LICENSE', 'utf8');
+    result.css = `/*! MIT License\n${projectLicense}*/\n${result.css}`;
     // コードブロックのボタン用スクリプトを追記する.
     // markdown 本文に直接 <script> を書くと marp-core にエスケープされて実行されないため,
     // レンダリング後の HTML 文字列に直接追記する (この経路なら実行される).
