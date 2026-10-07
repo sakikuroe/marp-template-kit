@@ -60,10 +60,29 @@ theme: modern
 HTML, 文字を選択できる PDF (`out/pdfs/`), 画像ベースの PDF (`out/png_pdfs/`) が生成されます.
 `backdrop-filter` の見た目を含めて確認する場合は, PNG 経由で変換した画像ベースの PDF を使用します.
 
+イメージは初回と `Containerfile` の変更時にビルドし, それ以外は既存イメージを再利用します.
+`serve.sh` も同じ判定を使用します. 選択できるオプションは `--help` で確認できます.
+
+```bash
+./build.sh --rebuild-image components.md     # キャッシュを使わず再ビルド
+./build.sh --skip-image-build components.md  # 変更の確認を省いて既存イメージを使用
+```
+
+従来の独自環境変数 `MARP_SKIP_IMAGE_BUILD` は廃止しました. `--skip-image-build` を使用してください.
+
+### CIでPDFを取得する
+
+PR, `main` へのpush, および手動実行で, コンポーネント一覧とサンプルをビルドします.
+GitHubの **Actions → Build slides → 実行結果 → Artifacts → slide-pdfs** からPDFを取得できます.
+文字を選択できるPDFを14日間保存します. ダウンロードにはGitHubへのログインとリポジトリの読み取り権限が必要です.
+CIの実行環境は毎回新しいため, イメージは各実行の初回にビルドします. 同じ実行内のサンプルでは再利用します.
+
 ### 注意
 
 - コンテナイメージの初回構築には, 依存関係とフォントを取得するためネットワーク接続が必要です.
 - フォントは生成 HTML に埋め込まれるため, 閲覧時に外部から取得する必要はありません.
+- ベースイメージはdigest, Chrome for Testing・Pythonの直接依存はバージョンを固定しています. Chromeと取得するフォントはチェックサムも検証します. 更新時は `Containerfile` の対応する値を変更してください.
+- OSパッケージと推移的依存は完全には固定していないため, 再ビルドがバイト単位で同一になる保証はありません.
 - git clone で取得した場合, 実行権限はすでに付与されています. 別の方法で取得した場合は `chmod +x build.sh` を実行してください.
 
 ## ライセンス
