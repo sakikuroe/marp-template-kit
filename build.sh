@@ -2,26 +2,21 @@
 # Podman 経由で marp-cli を実行し, Markdown から HTML と PDF を生成する.
 set -euo pipefail
 
-if [ "$#" -ne 1 ]; then
-  echo "usage: $0 main.md" >&2
-  exit 2
-fi
-
-input="$1"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$script_dir/scripts/container.sh"
+parse_container_options "$@"
 
 if [ ! -f "$input" ]; then
   echo "not found: $input" >&2
   exit 1
 fi
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 rel_input="$(realpath --relative-to="$script_dir" "$input")"
 base="$(basename "${input%.*}")"
 input_dir="$(dirname "$rel_input")"
 
 mkdir -p "$script_dir/out/htmls" "$script_dir/out/pdfs" "$script_dir/out/png_pdfs"
 
-image="localhost/marp-template-kit/tools"
 theme_path="/themes/modern.css"
 
 if ! podman info > /dev/null 2>&1; then
@@ -29,12 +24,7 @@ if ! podman info > /dev/null 2>&1; then
   exit 1
 fi
 
-if [ "${MARP_SKIP_IMAGE_BUILD:-0}" != 1 ]; then
-  podman build -q -t "$image" -f "$script_dir/Containerfile" "$script_dir" >&2
-elif ! podman image exists "$image"; then
-  echo "error: 既存イメージがありません. 最初に podman build を実行してください." >&2
-  exit 1
-fi
+ensure_tools_image
 
 mkdir -p "$script_dir/.cache"
 
