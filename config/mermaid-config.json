@@ -1,5 +1,6 @@
 {
+  "fontFamily": "\"GenEi M Gothic v2\", \"Noto Sans CJK JP\"",
   "themeVariables": {
-    "fontFamily": "\"Noto Sans CJK JP\""
+    "fontFamily": "\"GenEi M Gothic v2\", \"Noto Sans CJK JP\""
   }
 }

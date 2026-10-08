@@ -244,10 +244,10 @@ section code {
   padding: .05em .4em;
 }
 
-/* 罫線文字 (╭ ─ ┬ │) が行間で分断されないよう、グリフ (1em) が行ボックスを埋める値にする。
-   section の line-height 1.75 を継承すると縦罫線が途切れる。 */
+/* コードブロックは読みやすさのため、フォントサイズの20%分の行間を加える。
+   罫線文字による図では、縦罫線のつながりをビルド結果で確認する。 */
 pre {
-  line-height: 1.0;
+  line-height: 1.2;
 }
 
 /* ===== コンテンツ要素 ===== */
@@ -320,8 +320,9 @@ section td {
   white-space: nowrap;
 }
 
-/* 行単位の背景色もリセットする (縞模様などを消す)。 */
-section tr {
+/* 行単位の罫線と背景色もリセットする (本文行間の横線・縞模様を消す)。 */
+section table tr {
+  border: none;
   background-color: transparent !important;
 }
 

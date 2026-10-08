@@ -66,7 +66,7 @@ function renderMatplotlib(code) {
     const script = [
       'import matplotlib',
       'matplotlib.use("Agg")',  // ヘッドレス環境では非対話バックエンドが必要
-      'matplotlib.rcParams["font.family"] = "Noto Sans CJK JP"',
+      'matplotlib.rcParams["font.family"] = ["GenEi M Gothic v2", "Noto Sans CJK JP"]',
       `_output = ${JSON.stringify(pngPath)}`,
       code,
     ].join('\n');
