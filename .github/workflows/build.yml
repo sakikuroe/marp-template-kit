@@ -21,9 +21,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Check shell syntax and help
         run: |
-          bash -n scripts/build.sh scripts/serve.sh scripts/container.sh
+          bash -n scripts/*.sh
           ./scripts/build.sh --help
           ./scripts/serve.sh --help
+          ./scripts/render-mermaid.sh --help
+          ./scripts/render-drawio.sh --help
       - name: Install build and PDF inspection tools
         run: |
           sudo apt-get update
