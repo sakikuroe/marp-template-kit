@@ -8,7 +8,7 @@ parse_container_options() {
     case "$1" in
       --skip-image-build|--rebuild-image)
         if [ "$image_mode" != auto ]; then
-          echo 'error: イメージのオプションは1つだけ指定してください.' >&2
+          echo 'error: イメージのオプションは1つだけ指定してください。' >&2
           return 2
         fi
         image_mode="$1"
@@ -37,7 +37,7 @@ parse_container_options() {
         ;;
       *)
         if [ -n "$input" ]; then
-          echo "error: Markdown ファイルは1つ指定してください." >&2
+          echo "error: Markdown ファイルは1つ指定してください。" >&2
           return 2
         fi
         input="$1"
@@ -54,12 +54,14 @@ parse_container_options() {
 ensure_tools_image() {
   image="localhost/marp-template-kit/tools"
   local container_hash stored_hash
+  # 毎回podman buildを呼ばず、Containerfileのハッシュをイメージのラベルと比較する。
+  # 同じ環境で連続して図やスライドを生成するときの起動コストを抑える。
   container_hash="$(sha256sum "$script_dir/Containerfile")"
   container_hash="${container_hash%% *}"
 
   if [ "$image_mode" = --skip-image-build ]; then
     if ! podman image exists "$image"; then
-      echo 'error: 既存イメージがありません. オプションなしで実行してください.' >&2
+      echo 'error: 既存イメージがありません。オプションなしで実行してください。' >&2
       return 1
     fi
     return 0
@@ -67,12 +69,13 @@ ensure_tools_image() {
 
   stored_hash="$(podman image inspect --format '{{index .Config.Labels "jp.marp-template-kit.containerfile-sha256"}}' "$image" 2>/dev/null || true)"
   if [ "$image_mode" = auto ] && [ "$stored_hash" = "$container_hash" ]; then
-    echo 'image: 変更がないため既存イメージを使用します.' >&2
+    echo 'image: 変更がないため既存イメージを使用します。' >&2
     return 0
   fi
 
   local build_options=()
   if [ "$image_mode" = --rebuild-image ]; then
+    # 明示した再ビルドだけキャッシュを無効化する。通常の変更時には既存レイヤーを使う。
     build_options+=(--no-cache)
   fi
   podman build -q "${build_options[@]}" \

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# marp-cli のサーバーモードで HTML をリアルタイムプレビューする.
-# ファイルを変更するたびにブラウザが自動リロードされる.
-# Ctrl+C で停止する.
+# marp-cli のサーバーモードで HTML をリアルタイムプレビューする。
+# ファイルを変更するたびにブラウザが自動リロードされる。
+# Ctrl+C で停止する。
 set -euo pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$script_dir/scripts/container.sh"
 parse_container_options "$@"
 
@@ -17,7 +17,7 @@ rel_input="$(realpath --relative-to="$script_dir" "$input")"
 input_dir="$(dirname "$rel_input")"
 
 if ! podman info > /dev/null 2>&1; then
-  echo "error: podman が利用できません. インストールと設定を確認してください." >&2
+  echo "error: podman が利用できません。インストールと設定を確認してください。" >&2
   exit 1
 fi
 
@@ -38,6 +38,6 @@ podman run --rm --init \
   "$image" /home/marp/.cli/marp-cli.js \
   "/app/${input_dir}" \
   --theme-set /themes/modern.css \
-  --engine /app/engine.mjs \
+  --engine /app/scripts/engine.mjs \
   --server \
   --allow-local-files

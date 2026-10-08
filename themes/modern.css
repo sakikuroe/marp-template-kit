@@ -1,39 +1,39 @@
 /* @theme modern */
 /* @auto-scaling fittingHeader */
-/* Marp がこのファイルをテーマとして認識するための宣言. テーマ名は "modern".
-   スライドのフロントマターで `theme: modern` と指定することでこのテーマが適用される. */
+/* Marp がこのファイルをテーマとして認識するための宣言。テーマ名は "modern"。
+   スライドのフロントマターで `theme: modern` と指定することでこのテーマが適用される。 */
 
-/* Marp 組み込みの default テーマを継承する.
-   余白・背景色・フォントサイズ・見出しスタイルなど default テーマの全スタイルが引き継がれ,
-   このファイルに書いたスタイルで上書き・追加ができる. */
+/* Marp 組み込みの default テーマを継承する。
+   余白・背景色・フォントサイズ・見出しスタイルなど default テーマの全スタイルが引き継がれ、
+   このファイルに書いたスタイルで上書き・追加ができる。 */
 @import 'default';
 
 /* ===== CSS 変数 ===== */
-/* テーマ全体で参照するカスタムプロパティをここに集約して定義する.
-   調整頻度の高い値を一覧できるため, カスタマイズの起点として活用できる. */
+/* テーマ全体で参照するカスタムプロパティをここに集約して定義する。
+   調整頻度の高い値を一覧できるため、カスタマイズの起点として活用できる。 */
 section {
   /* --- キャンバス定数 --- */
-  /* --marpit-root-font-size: Marp のルートフォントサイズ. font-size と同値に設定する. */
+  /* --marpit-root-font-size: Marp のルートフォントサイズ。font-size と同値に設定する。 */
   --marpit-root-font-size: 87px;
-  /* 左帯の幅 (3x キャンバス基準, 視覚 約29px). コンテンツ領域は padding-left: 270px で帯と重ならない. */
+  /* 左帯の幅 (3x キャンバス基準、視覚 約29px)。コンテンツ領域は padding-left: 270px で帯と重ならない。 */
   --rail-width: 88px;
-  /* コードブロックのシャドウ. */
+  /* コードブロックのシャドウ。 */
   --card-shadow:
     0 1px 1px hsl(225 28% 18% / 0.05),
     0 3px 6px -2px hsl(225 30% 24% / 0.07),
     0 10px 18px -6px hsl(225 34% 34% / 0.075),
     0 28px 48px -18px hsl(225 52% 42% / 0.10);
-  /* コードブロックのシャドウ (ベタ・オフセット).
-     blur 0 で --ink 単色を右下にずらすことで, 紙が奥に重なったような表現にする. */
+  /* コードブロックのシャドウ (ベタ・オフセット)。
+     blur 0 で --ink 単色を右下にずらすことで、紙が奥に重なったような表現にする。 */
   --card-flat-shadow:
     12px 6px 0 0 var(--ink);
 
   /* --- 背景定数 --- */
-  /* グリッド線の色. 不透明な固定色を使うことで, 2 層のグラデーションが交差点で重なっても
-     色が濃くなる問題を回避している. */
+  /* グリッド線の色。不透明な固定色を使うことで、2 層のグラデーションが交差点で重なっても
+     色が濃くなる問題を回避している。 */
   --grid-line: rgb(240, 240, 240);
-  /* 方眼・帯・影・区切り線の背景 PNG (Firefox レンダリング).
-     section / section.cover / section.section で共有する. */
+  /* 方眼・帯・影・区切り線の背景 PNG (Firefox レンダリング)。
+     section / section.cover / section.section で共有する。 */
   --paper-bg: url('themes/background.png');
 
   /* --- カラーパレット --- */
@@ -43,25 +43,25 @@ section {
   --link: #4a7a96;
   --decoration-shadow: drop-shadow(12px 10px 2px rgba(0, 0, 0, 0.09));
   --rail-divider: rgba(24, 20, 16, 0.45);
-  /* コードブロックの枠・影に使う「インク」色. ベタ・オフセットデザインで枠と影を同色にする. */
+  /* コードブロックの枠・影に使う「インク」色。ベタ・オフセットデザインで枠と影を同色にする。 */
   --ink: var(--text);
 
   /* --- 本文スケーリング ---
      使い方: スライド内に <style scoped> section { --body-scale: 0.8; } </style> と書くと
-     見出し以外の本文全体を 0.8 倍にできる. デフォルトは 1 (等倍). */
+     見出し以外の本文全体を 0.8 倍にできる。デフォルトは 1 (等倍)。 */
   --body-scale: 1;
 }
 
 /* ===== キャンバス ===== */
-/* スライドキャンバスを 4K (3840x2160 = 標準の 3 倍) に拡大する.
-   Chromium は border-width を整数 px に切り捨てるため CSS 上の 1.5px を表現できない.
-   キャンバスを 3 倍にして 5px/3px で描画し, 33% 縮小表示時に視覚上 約1.67px/1px に見せる.
-   font-size・padding も 3 倍にしてレイアウト比率を維持する.
-   すべてのスライドのフォントを GenEi M Gothic v2 に設定する.
-   フォールバックには Noto Sans CJK JP (コンテナにインストール済み) を指定する. */
+/* スライドキャンバスを 4K (3840x2160 = 標準の 3 倍) に拡大する。
+   Chromium は border-width を整数 px に切り捨てるため CSS 上の 1.5px を表現できない。
+   キャンバスを 3 倍にして 5px/3px で描画し、33% 縮小表示時に視覚上 約1.67px/1px に見せる。
+   font-size・padding も 3 倍にしてレイアウト比率を維持する。
+   すべてのスライドのフォントを GenEi M Gothic v2 に設定する。
+   フォールバックには Noto Sans CJK JP (コンテナにインストール済み) を指定する。 */
 
-/* GenEi M Gothic v2 の実ウェイトをコンテナ内にインストールする.
-   engine.mjs がフォントを HTML に埋め込む. */
+/* GenEi M Gothic v2 の実ウェイトをコンテナ内にインストールする。
+   engine.mjs がフォントを HTML に埋め込む。 */
 @font-face {
   font-family: "GenEi M Gothic v2";
   font-weight: 400;
@@ -89,27 +89,27 @@ section {
 }
 
 /* ===== 背景・グリッド・帯 ===== */
-/* 方眼・帯・影・区切り線を Firefox でレンダリングした PNG を埋め込む.
-   CSS グラデーションは Chrome の PDF 出力でバンディングが生じるため,
-   Firefox ヘッドレスで高品質に撮影した画像に差し替えた. */
+/* 方眼・帯・影・区切り線を Firefox でレンダリングした PNG を埋め込む。
+   CSS グラデーションは Chrome の PDF 出力でバンディングが生じるため、
+   Firefox ヘッドレスで高品質に撮影した画像に差し替えた。 */
 section {
   background: var(--paper-bg) no-repeat 0 0 / 100% 100%;
 }
 
 /* ===== ヘッダー・フッター・ページ番号 ===== */
 /* default テーマの header・footer は font-size/left/top/bottom が 1x 基準の px で
-   ハードコードされているため, 3x キャンバスに合わせて 3 倍にオーバーライドする.
-   (default: font-size 18px, left 30px, top/bottom 21px → 各 3 倍) */
+   ハードコードされているため、3x キャンバスに合わせて 3 倍にオーバーライドする。
+   (default: font-size 18px、left 30px、top/bottom 21px → 各 3 倍) */
 section header,
 section footer {
   font-size: 54px;
   left: 90px;
 }
 
-/* スライドタイトルを帯内に 90° 反時計回りで表示 (6時→12時方向).
-   要素を横長 (width=縦スパン, height=フォント高) に置き,
-   底辺左端を軸に rotate(-90deg) することで帯内に収める.
-   left = 帯中央 + 行高の半分 = calc(var(--rail-width) / 2 + 0.5lh) で厳密に中央揃え. */
+/* スライドタイトルを帯内に 90° 反時計回りで表示 (6時→12時方向)。
+   要素を横長 (width=縦スパン、height=フォント高) に置き、
+   底辺左端を軸に rotate(-90deg) することで帯内に収める。
+   left = 帯中央 + 行高の半分 = calc(var(--rail-width) / 2 + 0.5lh) で厳密に中央揃え。 */
 section header {
   left: calc(var(--rail-width) / 2 + 0.5lh);
   bottom: 166px;
@@ -130,7 +130,7 @@ section footer {
   left: 270px;
 }
 
-/* ページ番号を帯 (--rail-width) の水平中央・下部に配置する. */
+/* ページ番号を帯 (--rail-width) の水平中央・下部に配置する。 */
 section::after {
   font-size: 45px;
   left: 0;
@@ -142,31 +142,31 @@ section::after {
 
 /* ===== タイポグラフィ ===== */
 
-/* リンクはアクセントに近い青系で本文と区別する. */
+/* リンクはアクセントに近い青系で本文と区別する。 */
 section a {
   color: var(--link);
 }
 
-/* h1 はスライドタイトルや大見出しに使う. --primary (濃い茶黒) で本文より重みを持たせる. */
+/* h1 はスライドタイトルや大見出しに使う。--primary (濃い茶黒) で本文より重みを持たせる。 */
 section h1 {
   color: var(--primary);
 }
 
-/* h2 見出しを左上に固定する.
-   section は block レイアウトのため, default テーマが h2 に付与する
-   margin-top: var(--base-size-24) (= 130px) などの影響でスライドごとに位置がずれる.
-   position: absolute で section の padding-top/left 位置に固定し, ずれをなくす.
-   :has(> h2) でコンテンツの開始位置を h2 の高さ分だけ下げる.
+/* h2 見出しを左上に固定する。
+   section は block レイアウトのため、default テーマが h2 に付与する
+   margin-top: var(--base-size-24) (= 130px) などの影響でスライドごとに位置がずれる。
+   position: absolute で section の padding-top/left 位置に固定し、ずれをなくす。
+   :has(> h2) でコンテンツの開始位置を h2 の高さ分だけ下げる。
      h2 高さ ≈ 141px (line-height) + 34px (padding-bottom) = 175px
      padding-top = 235.5 (section 元値) + 175 (h2) + 87 (gap) = 約 500px */
 section:has(> h2) {
   padding-top: 500px;
 }
 
-/* 見出しの左に縦長の長方形装飾を付ける.
-   白地・黒枠の矩形を ::before で描き, シェブロンと同じ drop-shadow を適用する.
-   width: 0.32em, height: 0.92em でキャップハイトに近い高さを設定する.
-   border: 5px (視覚 約1.67px). */
+/* 見出しの左に縦長の長方形装飾を付ける。
+   白地・黒枠の矩形を ::before で描き、シェブロンと同じ drop-shadow を適用する。
+   width: 0.32em、height: 0.92em でキャップハイトに近い高さを設定する。
+   border: 5px (視覚 約1.67px)。 */
 section>h2 {
   position: absolute;
   top: 235.5px;
@@ -190,8 +190,8 @@ section>h2::before {
   filter: var(--decoration-shadow);
 }
 
-/* h2 はスライドタイトル (position: absolute で固定), h3–h6 はコンテンツ内の小見出し.
-   いずれも --text (本文色) に揃える. h1 の --primary より軽く, 本文と区別しない設計. */
+/* h2 はスライドタイトル (position: absolute で固定)、h3–h6 はコンテンツ内の小見出し。
+   いずれも --text (本文色) に揃える。h1 の --primary より軽く、本文と区別しない設計。 */
 section>h2,
 section>h3,
 section>h4,
@@ -200,8 +200,8 @@ section>h6 {
   color: var(--text);
 }
 
-/* h3–h6 を本文フォントサイズより少しだけ大きくして視覚的な階層を作る.
-   1.15em = 本文の約 15% 増し. 過度に大きくせず, 段落の区切りとして機能させる. */
+/* h3–h6 を本文フォントサイズより少しだけ大きくして視覚的な階層を作る。
+   1.15em = 本文の約 15% 増し。過度に大きくせず、段落の区切りとして機能させる。 */
 section h3,
 section h4,
 section h5,
@@ -209,15 +209,15 @@ section h6 {
   font-size: 1.15em;
 }
 
-/* 太字: 色で区別し, font-weight は通常に戻す. */
+/* 太字: 色で区別し、font-weight は通常に戻す。 */
 section strong {
   color: var(--accent);
   font-weight: 500;
 }
 
-/* コンテナ内にインストールしたフォントを参照する.
-   engine.mjs が url() を base64 data URI に変換して HTML に埋め込むため,
-   閲覧マシンにフォントがなくても同一表示になる. */
+/* コンテナ内にインストールしたフォントを参照する。
+   engine.mjs が url() を base64 data URI に変換して HTML に埋め込むため、
+   閲覧マシンにフォントがなくても同一表示になる。 */
 @font-face {
   font-family: "Rounded Noto Code CJK JP";
   font-weight: 400;
@@ -231,29 +231,29 @@ section strong {
 }
 
 /* インラインコード (`code`) とコードブロック (<pre> 内の <code>) は
-   等幅フォントを維持するために上書きする.
-   section に指定したフォントがそのまま継承されてしまうため, ここで明示的に戻している. */
+   等幅フォントを維持するために上書きする。
+   section に指定したフォントがそのまま継承されてしまうため、ここで明示的に戻している。 */
 code,
 pre {
   font-family: "Rounded Noto Code CJK JP";
 }
 
-/* インラインコードのピルのパディングを default テーマ (.2em .4em) から変更する.
-   pre>code は default テーマ側で padding:0 (specificity 上位) になっているため影響しない. */
+/* インラインコードのピルのパディングを default テーマ (.2em .4em) から変更する。
+   pre>code は default テーマ側で padding:0 (specificity 上位) になっているため影響しない。 */
 section code {
   padding: .05em .4em;
 }
 
-/* 罫線文字 (╭ ─ ┬ │) が行間で分断されないよう, グリフ (1em) が行ボックスを埋める値にする.
-   section の line-height 1.75 を継承すると縦罫線が途切れる. */
+/* 罫線文字 (╭ ─ ┬ │) が行間で分断されないよう、グリフ (1em) が行ボックスを埋める値にする。
+   section の line-height 1.75 を継承すると縦罫線が途切れる。 */
 pre {
   line-height: 1.0;
 }
 
 /* ===== コンテンツ要素 ===== */
 
-/* 箇条書きをシェブロンデザインにする.
-   深さ 1→2→3 に従ってグレーを暗→中→淡にする. */
+/* 箇条書きをシェブロンデザインにする。
+   深さ 1→2→3 に従ってグレーを暗→中→淡にする。 */
 section ul {
   list-style: none !important;
   padding-left: 0 !important;
@@ -292,11 +292,11 @@ section ul>li::before {
   filter: drop-shadow(0px 9px 9px rgba(0, 0, 0, 0.09));
 }
 
-/* テーブルのデザイン.
-   縦線・行間の横線をなくし, 上下に線 (5px = 視覚 約1.67px), ヘッダーと本文の間に線 (3px = 視覚 1px) を引く.
-   キャンバスが 3x のため, 視覚上の目標値の 3 倍の px 値を指定している.
-   上辺と下辺を table 要素自体に設定することで, 上下が同じ描画パスになり太さが均一になる.
-   border-collapse: collapse で隣接セルの境界線を共有させ, 二重線を防ぐ. */
+/* テーブルのデザイン。
+   縦線・行間の横線をなくし、上下に線 (5px = 視覚 約1.67px)、ヘッダーと本文の間に線 (3px = 視覚 1px) を引く。
+   キャンバスが 3x のため、視覚上の目標値の 3 倍の px 値を指定している。
+   上辺と下辺を table 要素自体に設定することで、上下が同じ描画パスになり太さが均一になる。
+   border-collapse: collapse で隣接セルの境界線を共有させ、二重線を防ぐ。 */
 section table {
   border-collapse: collapse;
   border-top: 5px solid currentColor;
@@ -304,14 +304,14 @@ section table {
   margin: 1em auto;
 }
 
-/* blockquote は Note / Alert / Hint などの情報ボックスに使用する.
-   default テーマの左ボーダーと背景色はそのまま継承し, 上下マージンだけ統一する. */
+/* blockquote は Note / Alert / Hint などの情報ボックスに使用する。
+   default テーマの左ボーダーと背景色はそのまま継承し、上下マージンだけ統一する。 */
 section blockquote {
   margin: 1em 0;
 }
 
-/* すべてのセルのボーダーと背景色をリセットする.
-   default テーマが設定するボーダー・縞模様・背景色を消すために !important を使う. */
+/* すべてのセルのボーダーと背景色をリセットする。
+   default テーマが設定するボーダー・縞模様・背景色を消すために !important を使う。 */
 section th,
 section td {
   border: none !important;
@@ -320,27 +320,27 @@ section td {
   white-space: nowrap;
 }
 
-/* 行単位の背景色もリセットする (縞模様などを消す). */
+/* 行単位の背景色もリセットする (縞模様などを消す)。 */
 section tr {
   background-color: transparent !important;
 }
 
-/* ヘッダーセルは太字にする. */
+/* ヘッダーセルは太字にする。 */
 section th {
   font-weight: bold;
 }
 
-/* ヘッダーと本文の境界線 (3px = 視覚 1px): ヘッダー行の下に引く.
-   border: none !important を上書きするため !important が必要. */
+/* ヘッダーと本文の境界線 (3px = 視覚 1px): ヘッダー行の下に引く。
+   border: none !important を上書きするため !important が必要。 */
 section thead th {
   border-bottom: 3px solid currentColor !important;
 }
 
-/* コードブロック (<pre>) を「ベタ・オフセット」デザインにする.
-   default テーマの背景色・枠・角丸をリセットし, 印刷物・リソグラフのような
-   ぼかしゼロの重なり表現を適用する. 全数値は 3x キャンバス基準.
-   枠 (border) と影 (box-shadow) を同じ --ink 色で揃え, 影は blur 0 でベタ塗りにする.
-   具体的な太さ・オフセット量は border と --card-flat-shadow の値を直接参照すること. */
+/* コードブロック (<pre>) を「ベタ・オフセット」デザインにする。
+   default テーマの背景色・枠・角丸をリセットし、印刷物・リソグラフのような
+   ぼかしゼロの重なり表現を適用する。全数値は 3x キャンバス基準。
+   枠 (border) と影 (box-shadow) を同じ --ink 色で揃え、影は blur 0 でベタ塗りにする。
+   具体的な太さ・オフセット量は border と --card-flat-shadow の値を直接参照すること。 */
 section pre {
   position: relative;
   overflow: visible !important;
@@ -355,10 +355,10 @@ section pre {
   box-shadow: var(--card-flat-shadow);
 }
 
-/* pre 内の code 要素が持つ背景色もリセットする.
-   default テーマの white-space: pre (折り返しなし) だと長い行が枠の外にはみ出すため,
-   pre-wrap で枠内に折り返す. 折り返した2行目以降が元の行の続きか新しい行かは区別しない
-   (行番号を持たない設計のため, 割り切ってシンプルにしている). */
+/* pre 内の code 要素が持つ背景色もリセットする。
+   default テーマの white-space: pre (折り返しなし) だと長い行が枠の外にはみ出すため、
+   pre-wrap で枠内に折り返す。折り返した2行目以降が元の行の続きか新しい行かは区別しない
+   (行番号を持たない設計のため、割り切ってシンプルにしている)。 */
 section pre code {
   background: transparent !important;
   white-space: pre-wrap !important;
@@ -366,17 +366,17 @@ section pre code {
 }
 
 /* ===== コードブロックの Copy / Download ボタン =====
-   engine.mjs の fence レンダラーが <pre> を .code-block-wrap で包み,
-   ツールバー (.code-toolbar 内の 2 ボタン) を追加している.
-   ボタンの実処理 (クリックイベント) も engine.mjs が生成する <script> で行う. */
+   engine.mjs の fence レンダラーが <pre> を .code-block-wrap で包み、
+   ツールバー (.code-toolbar 内の 2 ボタン) を追加している。
+   ボタンの実処理 (クリックイベント) も engine.mjs が生成する <script> で行う。 */
 
-/* .code-block-wrap は pre の位置決めコンテキスト.
-   ツールバーを pre の右上角に重ねて配置するための relative. */
+/* .code-block-wrap は pre の位置決めコンテキスト。
+   ツールバーを pre の右上角に重ねて配置するための relative。 */
 section .code-block-wrap {
   position: relative;
 }
 
-/* HTML 出力でのみ意味を持つ (PDF はボタンが機能しないため印刷時は非表示にする). */
+/* HTML 出力でのみ意味を持つ (PDF はボタンが機能しないため印刷時は非表示にする)。 */
 section .code-toolbar {
   position: absolute;
   top: -27px;
@@ -409,22 +409,22 @@ section .code-toolbar button.copied {
   color: #fff;
 }
 
-/* インライン画像をデフォルトで中央揃えにする.
-   bg 画像は CSS background-image に変換されるため影響しない.
-   .emoji は Marp が絵文字を変換した <img> なのでインライン表示を維持する. */
+/* インライン画像をデフォルトで中央揃えにする。
+   bg 画像は CSS background-image に変換されるため影響しない。
+   .emoji は Marp が絵文字を変換した <img> なのでインライン表示を維持する。 */
 section img:not(.emoji) {
   display: block;
   margin: 0 auto;
 }
 
-/* リストや段落内でテキストと同行するアイコン用クラス.
-   Markdown 画像構文ではクラスを付けられないため, HTML の <img class="inline-icon"> を使う.
-   アイコンの viewBox は 0 0 100 100 で図形がボックス中央に収まっているため, ボックスの上下中心が
-   そのまま図形の視覚的中心になる. vertical-align でその中心を行内和文の視覚的中心
-   (≒漢字の字面の中央) に合わせる.
-   vertical-align は icon ボックスの下端を基準に上へ持ち上げる量なので, アイコン中心 = vertical-align
-   + width/2 となる. したがって width を変えると中心位置がずれるため, vertical-align も再調整が必要.
-   値はビルド結果のピクセル計測で決めている (width: 1.5em のとき -0.366em で字面中央に一致). */
+/* リストや段落内でテキストと同行するアイコン用クラス。
+   Markdown 画像構文ではクラスを付けられないため、HTML の <img class="inline-icon"> を使う。
+   アイコンの viewBox は 0 0 100 100 で図形がボックス中央に収まっているため、ボックスの上下中心が
+   そのまま図形の視覚的中心になる。vertical-align でその中心を行内和文の視覚的中心
+   (≒漢字の字面の中央) に合わせる。
+   vertical-align は icon ボックスの下端を基準に上へ持ち上げる量なので、アイコン中心 = vertical-align
+   + width/2 となる。したがって width を変えると中心位置がずれるため、vertical-align も再調整が必要。
+   値はビルド結果のピクセル計測で決めている (width: 1.5em のとき -0.366em で字面中央に一致)。 */
 section img.inline-icon {
   display: inline-block;
   width: 1.5em;
@@ -433,10 +433,10 @@ section img.inline-icon {
   vertical-align: -0.366em;
 }
 
-/* アイコンを先頭に置くリストでは, テーマのシェブロン (li::before) を非表示にし,
-   アイコン自体を行頭マーカーとして使う. padding-left を 0 に戻してアイコンを左端へ寄せる.
+/* アイコンを先頭に置くリストでは、テーマのシェブロン (li::before) を非表示にし、
+   アイコン自体を行頭マーカーとして使う。padding-left を 0 に戻してアイコンを左端へ寄せる。
    上下中心揃えは flex ではなく inline-icon の vertical-align に任せる
-   (flex の align-items:center は行が折り返したとき先頭行と中心がずれるため). */
+   (flex の align-items:center は行が折り返したとき先頭行と中心がずれるため)。 */
 section ul:has(.inline-icon)>li {
   padding-left: 0 !important;
 }
@@ -445,8 +445,8 @@ section ul:has(.inline-icon)>li::before {
   display: none;
 }
 
-/* 画像直後の em (*italic*) をキャプションとして表示する.
-   規約: 画像の次行に *キャプション文字列* と書くと自動でスタイルが適用される. */
+/* 画像直後の em (*italic*) をキャプションとして表示する。
+   規約: 画像の次行に *キャプション文字列* と書くと自動でスタイルが適用される。 */
 section p img~em {
   display: block;
   text-align: center;
@@ -457,8 +457,8 @@ section p img~em {
 }
 
 /* ===== 本文スケーリング ===== */
-/* --body-scale は CSS 変数セクションで定義済み.
-   見出し以外のすべての直接子要素のフォントサイズに適用する. */
+/* --body-scale は CSS 変数セクションで定義済み。
+   見出し以外のすべての直接子要素のフォントサイズに適用する。 */
 section>p,
 section>ul,
 section>ol,
@@ -473,16 +473,16 @@ section>.cols {
   font-size: calc(var(--body-scale) * 1em);
 }
 
-/* コードブロックは本文の 75% のサイズにする.
-   engine.mjs が <pre> を .code-block-wrap で包むため, section の直接の子は
-   .code-block-wrap になる. font-size は子孫の pre にも継承されるので併記は不要. */
+/* コードブロックは本文の 75% のサイズにする。
+   engine.mjs が <pre> を .code-block-wrap で包むため、section の直接の子は
+   .code-block-wrap になる。font-size は子孫の pre にも継承されるので併記は不要。 */
 section>.code-block-wrap {
   font-size: calc(var(--body-scale) * 0.75em);
 }
 
 /* ===== 表紙スライド (_class: cover) ===== */
 
-/* flex でコンテンツを上下中央に寄せる. 右側に幾何学的 SVG 装飾を合成する. */
+/* flex でコンテンツを上下中央に寄せる。右側に幾何学的 SVG 装飾を合成する。 */
 section.cover {
   display: flex;
   flex-direction: column;
@@ -494,17 +494,17 @@ section.cover {
   background-position: 0 0, 0 0;
 }
 
-/* section:has(> h2) の padding-top: 500px をリセットする. */
+/* section:has(> h2) の padding-top: 500px をリセットする。 */
 section.cover:has(> h2) {
   padding-top: 235.5px;
 }
 
-/* 表紙ではページ番号を非表示にする. */
+/* 表紙ではページ番号を非表示にする。 */
 section.cover::after {
   display: none;
 }
 
-/* プレゼンテーションタイトル. */
+/* プレゼンテーションタイトル。 */
 section.cover>h1 {
   color: var(--primary);
   font-size: 180px;
@@ -516,7 +516,7 @@ section.cover>h1 {
   max-width: 2400px;
 }
 
-/* タイトル下のアクセントライン. */
+/* タイトル下のアクセントライン。 */
 section.cover>h1::after {
   content: '';
   display: block;
@@ -526,7 +526,7 @@ section.cover>h1::after {
   margin-top: 54px;
 }
 
-/* サブタイトル (任意): section>h2 の position:absolute をリセットして flex フローに戻す. */
+/* サブタイトル (任意): section>h2 の position:absolute をリセットして flex フローに戻す。 */
 section.cover>h2 {
   position: relative;
   top: auto;
@@ -545,7 +545,7 @@ section.cover>h2::before {
   display: none;
 }
 
-/* 発表者情報: スライド下部に固定. */
+/* 発表者情報: スライド下部に固定。 */
 section.cover>p {
   position: absolute;
   bottom: 235.5px;
@@ -561,14 +561,14 @@ section.cover>p {
 
 /* ===== セクション見出しスライド (_class: section) ===== */
 
-/* 方眼紙と左帯を維持し, 見出しに視線が集まる背景にする. */
+/* 方眼紙と左帯を維持し、見出しに視線が集まる背景にする。 */
 section.section {
   background-image: var(--paper-bg);
 }
 
-/* セクション番号: 大きく左に配置する.
-   default テーマ由来の下余白を除き, 数字の字形を上下中央に合わせる.
-   源暎エムゴ Medium・448px は字形の中心が行ボックスの中心より約9px下にある. */
+/* セクション番号: 大きく左に配置する。
+   default テーマ由来の下余白を除き、数字の字形を上下中央に合わせる。
+   源暎エムゴ Medium・448px は字形の中心が行ボックスの中心より約9px下にある。 */
 section.section>h1 {
   position: absolute;
   left: 384px;
@@ -584,9 +584,9 @@ section.section>h1 {
   padding: 0;
 }
 
-/* メイン見出し: 横線を含む全体を縦方向中央から8px下に配置する.
-   1920×1080表示では4pxの補正になる.
-   実際の高さを基準にするため, 1〜3 行の見出しでも位置の個別調整は不要. */
+/* メイン見出し: 横線を含む全体を縦方向中央から8px下に配置する。
+   1920×1080表示では4pxの補正になる。
+   実際の高さを基準にするため、1〜3 行の見出しでも位置の個別調整は不要。 */
 section.section>h3 {
   position: absolute;
   left: 1040px;
@@ -606,7 +606,7 @@ section.section>h3::before {
   display: none;
 }
 
-/* h3 直下の短い区切り線 (3x キャンバス基準: 320px = 視覚 約107px). */
+/* h3 直下の短い区切り線 (3x キャンバス基準: 320px = 視覚 約107px)。 */
 section.section>h3::after {
   content: '';
   display: block;
@@ -617,8 +617,8 @@ section.section>h3::after {
 }
 
 /* ===== 定理環境 (Theorem-like environments) ===== */
-/* 使い方: <div class="thm"> の直後を空行にすると Marp が Markdown をレンダリングする.
-   第 1 段落に **型番号** *名前* と書くとラベルとして整形される. */
+/* 使い方: <div class="thm"> の直後を空行にすると Marp が Markdown をレンダリングする。
+   第 1 段落に **型番号** *名前* と書くとラベルとして整形される。 */
 
 .def,
 .thm,
@@ -629,7 +629,7 @@ section.section>h3::after {
   margin: 60px 0;
 }
 
-/* 第 1 段落をラベル行として整形する. */
+/* 第 1 段落をラベル行として整形する。 */
 .def>p:first-child,
 .thm>p:first-child,
 .cor>p:first-child,
@@ -679,7 +679,7 @@ section.section>h3::after {
 }
 
 /* ===== 証明環境 ===== */
-/* 使い方: <div class="proof"> — "Proof." ラベルは ::before で自動挿入される. */
+/* 使い方: <div class="proof"> — "Proof." ラベルは ::before で自動挿入される。 */
 
 .proof {
   border-left: 8px solid rgba(24, 20, 16, 0.12);
@@ -688,7 +688,7 @@ section.section>h3::after {
   color: rgba(24, 20, 16, 0.7);
 }
 
-/* "Proof." ラベルを自動挿入 (セリフ体・イタリック). */
+/* "Proof." ラベルを自動挿入 (セリフ体・イタリック)。 */
 .proof::before {
   content: 'Proof.';
   display: block;
@@ -700,9 +700,9 @@ section.section>h3::after {
 }
 
 /* ===== カラムレイアウト (.cols) ===== */
-/* 列レイアウトの汎用グリッドコンテナ.
-   テキスト・画像・カードなど内容の種類を問わず使用できる.
-   grid-template-columns を上書きすると列の比率を変えられる.
+/* 列レイアウトの汎用グリッドコンテナ。
+   テキスト・画像・カードなど内容の種類を問わず使用できる。
+   grid-template-columns を上書きすると列の比率を変えられる。
    例: style="grid-template-columns: 1fr 2fr" */
 .cols {
   display: grid;
@@ -713,24 +713,24 @@ section.section>h3::after {
   margin-top: 108px;
 }
 
-/* 画像は列幅いっぱいに自動的に収まるようにする.
-   height: auto でアスペクト比を維持し, display: block で余白を除去する. */
+/* 画像は列幅いっぱいに自動的に収まるようにする。
+   height: auto でアスペクト比を維持し、display: block で余白を除去する。 */
 .cols img {
   width: 100%;
   height: auto;
   display: block;
 }
 
-/* .card: .cols 内で使用する, 見出し・下線・本文で構成するスタイル.
-   先頭の段落を見出しとして強調し, --card-accent 色の下線で本文と区切る.
-   --card-accent: 見出し下線の色. デフォルトは #4d4d4d (コードブロックの角線と同じ色).
-   フォントサイズは <style scoped> section { --body-scale: 0.72; } </style> で調整する. */
+/* .card: .cols 内で使用する、見出し・下線・本文で構成するスタイル。
+   先頭の段落を見出しとして強調し、--card-accent 色の下線で本文と区切る。
+   --card-accent: 見出し下線の色。デフォルトは #4d4d4d (コードブロックの角線と同じ色)。
+   フォントサイズは <style scoped> section { --body-scale: 0.72; } </style> で調整する。 */
 .card {
   --card-accent: #4d4d4d;
 }
 
-/* 見出し (先頭の段落): 本文より一回り大きく, h1~h3 と同じ --primary, font-weight: 600 で強調する.
-   直下に --card-accent 色の短い区切り線を引いて本文と区切る (section.section>h3 と同じ構成). */
+/* 見出し (先頭の段落): 本文より一回り大きく、h1~h3 と同じ --primary、font-weight: 600 で強調する。
+   直下に --card-accent 色の短い区切り線を引いて本文と区切る (section.section>h3 と同じ構成)。 */
 .card>p:first-child {
   font-size: 1.2em;
   font-weight: 600;
@@ -747,14 +747,14 @@ section.section>h3::after {
   margin-top: 24px;
 }
 
-/* section strong (--accent / 500) を打ち消し, 見出しの色・太さに揃える. */
+/* section strong (--accent / 500) を打ち消し、見出しの色・太さに揃える。 */
 .card>p:first-child strong {
   color: var(--primary);
   font-weight: 600;
 }
 
-/* カード本文: 本文色をわずかに薄めて見出しと対比させる.
-   先頭要素の上マージンは 0 に固定して, 見出しの下線との二重余白を防ぐ. */
+/* カード本文: 本文色をわずかに薄めて見出しと対比させる。
+   先頭要素の上マージンは 0 に固定して、見出しの下線との二重余白を防ぐ。 */
 .card>p:not(:first-child),
 .card>ul,
 .card>ol {
@@ -763,7 +763,7 @@ section.section>h3::after {
   margin: 0;
 }
 
-/* 隣接する段落・リスト間にのみ上マージンを付ける (先頭要素には margin: 0 を維持). */
+/* 隣接する段落・リスト間にのみ上マージンを付ける (先頭要素には margin: 0 を維持)。 */
 .card>p+p,
 .card>p+ul,
 .card>p+ol,

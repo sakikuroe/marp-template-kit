@@ -21,18 +21,18 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Check shell syntax and help
         run: |
-          bash -n build.sh serve.sh scripts/container.sh
-          ./build.sh --help
-          ./serve.sh --help
+          bash -n scripts/build.sh scripts/serve.sh scripts/container.sh
+          ./scripts/build.sh --help
+          ./scripts/serve.sh --help
       - name: Install build and PDF inspection tools
         run: |
           sudo apt-get update
           sudo apt-get install -y podman poppler-utils
       - name: Build components and samples
         run: |
-          ./build.sh components.md 2>&1 | tee build.log
+          : > build.log
           for input in samples/*.md; do
-            ./build.sh "$input" 2>&1 | tee -a build.log
+            ./scripts/build.sh "$input" 2>&1 | tee -a build.log
           done
           if grep -E '^\[(mermaid|matplotlib)\]' build.log; then
             echo 'Diagram rendering failed.' >&2
