@@ -22,6 +22,7 @@ Marp を使ったスライド作成のためのテンプレートです。
 ├── samples/              # 各種サンプルスライド
 │   ├── components.md     # 使用できるコンポーネント一覧
 │   ├── release-process.mmd # 架空の段階的リリース手順
+│   ├── diagram-gallery.drawio # 計画・業務・設計・画面・受注処理の21ページ
 │   └── morning.md        # 朝会報告のサンプル
 ├── assets/               # サンプルで使用する画像
 ├── themes/
@@ -106,14 +107,60 @@ SVGにはフォントを埋め込み、PNGは2倍の解像度で描画します�
 ### draw.io単体ファイルを変換する
 
 ```bash
-./scripts/render-drawio.sh --page 1 diagram.drawio out/diagrams/diagram.svg
-./scripts/render-drawio.sh --page 1 diagram.drawio out/diagrams/diagram.png
+./scripts/render-drawio.sh --page 21 samples/diagram-gallery.drawio out/diagrams/order-process.svg
+./scripts/render-drawio.sh --page 21 samples/diagram-gallery.drawio out/diagrams/order-process.png
 ```
 
 公式draw.io DesktopをPodman内で実行し、透明背景で出力します。PNGは2倍の解像度で描画します。
-フォントや配置は入力ファイルの設定を使います。SVGには源暎エムゴのRegular/Medium/Boldを埋め込みます。
+フォントや配置は入力ファイルの設定を使います。サンプルは源暎エムゴの通常文字をMedium（500）、タイトルの太字をBold（700）にしています。SVGにはRegular/Medium/Boldを埋め込みます。
 複数ページのファイルは標準で最初のページを出力し、`--page`で選択できます。外部URLの画像やフォントは取得しないため、画像は図に埋め込み、フォントはコンテナにあるものを指定してください。
 既存イメージの再利用とイメージ操作のオプションはビルドスクリプトと共通です。
+
+`samples/diagram-gallery.drawio`には、貸出予約サービスを題材にした20種類の図と、受注処理のフローチャートを合わせた21ページを収録しています。
+VS Codeのdraw.io拡張ではページを切り替えて編集できます。書き出すときは`--page`で選びます。
+人物・日付・数値は架空の例です。ガントは担当・開始終了日・進捗・先行条件・承認ゲート、WBSは成果物・責任者・完了条件、カンバンは着手条件・WIP上限・経過日数・完了条件を含みます。
+
+| ページ | 図 | 説明する内容 |
+| --- | --- | --- |
+| 1 | システム構成図 | 利用者・画面・API・DB・通知処理のつながり |
+| 2 | シーケンス図 | 予約受付時の呼び出しと応答の順番 |
+| 3 | ER図 | 利用者・書誌・資料個体・予約・貸出・通知の関連 |
+| 4 | 状態遷移図 | 待ち・準備・受取と、取消・期限切れの状態とイベント |
+| 5 | マインドマップ | 利用者・スタッフ・運用・データの検討事項 |
+| 6 | 組織図 | チームの責任と担当範囲 |
+| 7 | 作業分解図 | 成果物・責任者・完了条件 |
+| 8 | スイムレーン図 | 担当者間の引き継ぎと例外処理 |
+| 9 | ユースケース図 | 利用者の目的とサービスの境界 |
+| 10 | クラス図 | 属性・操作・関連 |
+| 11 | データフロー図 | 入力・記録・参照の流れ |
+| 12 | ネットワーク図 | 接続とネットワークの分離 |
+| 13 | 配置図 | ホストと実行するプロセス |
+| 14 | ロードマップ | 公開範囲と目標の段階 |
+| 15 | ガントチャート | 作業期間・担当・進捗・依存関係 |
+| 16 | カンバンボード | 作業の状態・上限・滞留 |
+| 17 | カスタマージャーニー | 行動・感情の理由・改善の優先度・担当と指標 |
+| 18 | 判断ツリー | 問い合わせへの対応の選択 |
+| 19 | 故障の木解析 | 障害の原因と観測・対策 |
+| 20 | ワイヤーフレーム | 画面の情報と操作の配置 |
+| 21 | フローチャート | 受注・在庫確認・決済・出荷・通知の流れ |
+
+白い図形、黒い線、控えめな角丸と影、源暎エムゴ500／700を共通にしています。
+出力範囲と配置は各図の用途に合わせて決まります。単体で共有しても対象が分かるように、図名・対象範囲は必要に応じて見出し、中心のテーマ、システム境界などに記します。
+凡例・基準日・制約・判断条件は残し、関連線、該当作業、画面の外側など、読み手が必要とする場所に置きます。全図に同じ見出し・補足見出し・フッターの配置を当てはめることはしません。
+大きい囲み枠とER図のカードは固定の角丸にし、図形が大きくても角丸を大きくしません。
+矢印や関連の記号は図の種類に合わせ、シーケンス図の直線やER図の多重度は維持します。
+カスタマージャーニーの感情は未調査の仮説として言葉と理由を記し、数値の折れ線にはしていません。
+故障の木解析は論理ゲートを文字で表記した簡略図です。原因の網羅性や発生確率は検証対象として明記しています。
+
+```bash
+./scripts/render-drawio.sh --page 3 samples/diagram-gallery.drawio out/diagrams/gallery/er.svg
+./scripts/render-drawio.sh --page 3 samples/diagram-gallery.drawio out/diagrams/gallery/er.png
+./scripts/render-drawio.sh --page 15 samples/diagram-gallery.drawio out/diagrams/gallery/gantt.svg
+./scripts/render-drawio.sh --page 15 samples/diagram-gallery.drawio out/diagrams/gallery/gantt.png
+```
+
+記法と内容の参考：[Mermaidのガント](https://mermaid.js.org/syntax/gantt.html)、[PMIのWBS解説](https://www.pmi.org/learning/library/practice-standard-work-breakdown-structures-8063)、[Kanban Guide](https://kanbanguides.org/the-kanban-guide/)、[NN/gのジャーニーマップ解説](https://www.nngroup.com/articles/journey-mapping-101/)、[draw.ioのDFD解説](https://www.drawio.com/docs/diagram-types/data-flow-diagrams/)。作例はこれらの図を複製したものではなく、このリポジトリ用に作成しています。
+ER図・シーケンス図・原因分析では、[draw.ioの多重度の記法](https://www.drawio.com/docs/tutorials/crows-foot-notation/)、[シーケンス図の解説](https://www.drawio.com/docs/diagram-types/uml/sequence-diagrams/)、[NASAのFault Tree Handbook（PDF）](https://s3vi.ndc.nasa.gov/ssri-kb/static/resources/Fault%20Tree%20Handbook_NASA.pdf)も参照しています。
 
 ### 図の画質・サイズ・共有方法を指定する
 
@@ -143,7 +190,7 @@ draw.ioは幅・高さの同時指定や、サイズ指定と倍率の併用を�
 ./scripts/render-drawio.sh --page 2 --width 1600 diagram.drawio out/diagrams/page-2.png
 
 # 同じフォントがある環境へ共有する、フォントを埋め込まないSVG。
-./scripts/render-drawio.sh --page 1 --no-embed-fonts --force diagram.drawio out/diagrams/diagram.svg
+./scripts/render-drawio.sh --page 21 --no-embed-fonts --force samples/diagram-gallery.drawio out/diagrams/order-process.svg
 ```
 
 すべてのオプションは各スクリプトの`--help`で確認できます。
