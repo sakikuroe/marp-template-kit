@@ -6,25 +6,15 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$script_dir/scripts/container.sh"
-parse_container_options "$@"
+parse_slide_options "$@"
 
-if [ ! -f "$input" ]; then
-  echo "not found: $input" >&2
-  exit 1
-fi
-
-rel_input="$(realpath --relative-to="$script_dir" "$input")"
+rel_input="$(markdown_path "$script_dir" "$input")"
 input_dir="$(dirname "$rel_input")"
 
-if ! podman info > /dev/null 2>&1; then
-  echo "error: podman が利用できません。インストールと設定を確認してください。" >&2
-  exit 1
-fi
+image="$(ensure_tools_image "$script_dir" "$image_mode")"
 
-ensure_tools_image
-
-base="$(basename "${input%.*}")"
-echo "preview: http://localhost:8080/${base}.md" >&2
+filename="$(basename -- "$rel_input")"
+echo "preview: http://localhost:8080/$filename" >&2
 
 podman run --rm --init \
   --userns=keep-id \

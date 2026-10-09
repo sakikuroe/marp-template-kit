@@ -4,27 +4,17 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$script_dir/scripts/container.sh"
-parse_container_options "$@"
+parse_slide_options "$@"
 
-if [ ! -f "$input" ]; then
-  echo "not found: $input" >&2
-  exit 1
-fi
-
-rel_input="$(realpath --relative-to="$script_dir" "$input")"
-base="$(basename "${input%.*}")"
+rel_input="$(markdown_path "$script_dir" "$input")"
+base="$(basename -- "${input%.*}")"
 input_dir="$(dirname "$rel_input")"
 
 mkdir -p "$script_dir/out/htmls" "$script_dir/out/pdfs" "$script_dir/out/png_pdfs"
 
 theme_path="/themes/modern.css"
 
-if ! podman info > /dev/null 2>&1; then
-  echo "error: podman が利用できません。インストールと設定を確認してください。" >&2
-  exit 1
-fi
-
-ensure_tools_image
+image="$(ensure_tools_image "$script_dir" "$image_mode")"
 
 mkdir -p "$script_dir/.cache"
 
@@ -124,9 +114,17 @@ _out=$(podman run --rm --init \
   --allow-local-files 2>&1) || { rc=$?; printf '%s\n' "$_out" >&2; exit "$rc"; }
 printf '%s\n' "$_out" | grep -Ev '\[  WARN \] Insecure local file|^ +\S+\.md$' >&2 || true
 
-# ls -v で数値順にソートし、ホスト側パスをコンテナ内パスに変換して img2pdf に渡す。
-# img2pdf はページ順に PNG を結合するため、順序の保証が必要。
-mapfile -t png_args < <(ls -v "$script_dir/.cache/${base}".*.png | sed "s|^$script_dir|/app|")
+# ファイル名を行や正規表現として解釈せず、数値順でimg2pdfへ渡す。
+# 空白や角括弧を含む名前でも、パス変換とページ順が壊れないようにする。
+shopt -s nullglob
+png_paths=( "$script_dir/.cache/${base}".*.png )
+if [ "${#png_paths[@]}" -eq 0 ]; then
+  echo 'error: スライドのPNGが生成されませんでした。' >&2
+  exit 1
+fi
+mapfile -d '' -t png_paths < <(printf '%s\0' "${png_paths[@]}" | sort -zV)
+png_args=()
+for png in "${png_paths[@]}"; do png_args+=("/app/.cache/$(basename -- "$png")"); done
 podman run --rm --init \
   --userns=keep-id \
   --network=none \
