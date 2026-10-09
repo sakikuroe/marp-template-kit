@@ -9,7 +9,7 @@ usage() {
   printf 'usage: %s [オプション] <図.mmd|図.mermaid|図.drawio>\n' "$0"
   cat <<'HELP'
   標準: SVGとPNG、透明背景、周囲16px、PNG 2倍、SVGにフォント埋め込み
-        draw.ioは全ページ。出力先はリポジトリ内のout/diagrams/<入力名>/
+        draw.ioは全ページ。出力先はリポジトリ内のout/diagrams/
   --output DIR           出力ディレクトリ
   --format both|svg|png  出力形式。標準: both
   --page N               draw.ioの指定ページだけ出力。1から数える
@@ -78,8 +78,7 @@ esac
 [ -f "$input" ] || fail "入力ファイルがありません: $input"
 if [ -n "$png_width" ] && [ "$scale_set" = true ]; then fail '--png-widthと--scaleは併用できません。'; fi
 if [ "$format" = svg ] && { [ -n "$png_width" ] || [ "$scale_set" = true ]; }; then fail 'PNGのサイズ指定にはPNG出力が必要です。'; fi
-stem="$(basename -- "${input%.*}")"
-output="${output:-$project_dir/out/diagrams/$stem}"
+output="${output:-$project_dir/out/diagrams}"
 [ ! -e "$output" ] || [ -d "$output" ] || fail "出力先はディレクトリを指定してください: $output"
 
 image="$(ensure_tools_image "$project_dir" "$image_mode")"

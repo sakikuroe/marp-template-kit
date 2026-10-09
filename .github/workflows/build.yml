@@ -43,18 +43,18 @@ jobs:
         run: |
           ./scripts/render-diagram.sh samples/release-process.mmd
           ./scripts/render-diagram.sh --page 22 samples/diagram-gallery.drawio
-          ./scripts/render-diagram.sh --background 'rgba(20,80,160,0.25)' --png-width 701 --no-embed-fonts --output out/diagrams/rgba samples/release-process.mmd
-          test -s out/diagrams/release-process/release-process.svg
-          test -s out/diagrams/release-process/release-process.png
-          test -s out/diagrams/diagram-gallery/diagram-gallery-22.svg
-          test -s out/diagrams/diagram-gallery/diagram-gallery-22.png
-          podman run --rm --network=none -v "$PWD:/app:ro" --entrypoint python3 localhost/marp-template-kit/tools -c '
+          ./scripts/render-diagram.sh --background 'rgba(20,80,160,0.25)' --png-width 701 --no-embed-fonts --output "$RUNNER_TEMP/diagram-rgba" samples/release-process.mmd
+          test -s out/diagrams/release-process.svg
+          test -s out/diagrams/release-process.png
+          test -s out/diagrams/diagram-gallery-22.svg
+          test -s out/diagrams/diagram-gallery-22.png
+          podman run --rm --network=none -v "$RUNNER_TEMP/diagram-rgba:/check:ro" --entrypoint python3 localhost/marp-template-kit/tools -c '
           from PIL import Image
-          image = Image.open("/app/out/diagrams/rgba/release-process.png")
+          image = Image.open("/check/release-process.png")
           assert image.width == 701
           pixel = image.convert("RGBA").getpixel((0, 0))
           assert all(abs(a-b) <= 1 for a,b in zip(pixel, (20,80,160,64))), pixel
-          svg = open("/app/out/diagrams/rgba/release-process.svg").read()
+          svg = open("/check/release-process.svg").read()
           assert "@font-face" not in svg and "data:font" not in svg
           '
       - name: Verify selectable PDF text

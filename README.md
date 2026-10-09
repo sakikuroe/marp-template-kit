@@ -103,8 +103,9 @@ HTML、文字を選択できる PDF (`out/pdfs/`)、画像ベースの PDF (`out
 ```
 
 入力の拡張子でMermaid（`.mmd`・`.mermaid`）とdraw.io（`.drawio`）を判別します。
-1回の実行でSVGとPNGを生成し、標準の出力先は`out/diagrams/<入力名>/`です。
-上の例では`release-process/release-process.svg`・`.png`、`diagram-gallery/diagram-gallery-21.svg`・`.png`ができます。
+1回の実行でSVGとPNGを生成し、標準の出力先は`out/diagrams/`です。
+上の例では`out/diagrams/release-process.svg`・`.png`、`out/diagrams/diagram-gallery-21.svg`・`.png`ができます。
+入力形式やページ数によって出力先を変えず、ファイル名で入力とページを区別します。
 背景は透明、余白は16px、SVGはフォント埋め込み、PNGは2倍の解像度が標準です。
 PNGは完成したSVGから描画するため、両形式で配置とフォントが揃います。
 
@@ -199,7 +200,7 @@ PNGは可逆圧縮のためJPEGのような品質値は設けず、描画倍率�
 ./scripts/render-diagram.sh --format png --scale 3 --background white --force samples/release-process.mmd
 
 # 半透明の背景を指定する。SVG・PNGとも透明度を維持する。
-./scripts/render-diagram.sh --background 'rgba(240,245,250,0.5)' --output out/diagrams/translucent samples/release-process.mmd
+./scripts/render-diagram.sh --background 'rgba(240,245,250,0.5)' --output /tmp/diagram-preview samples/release-process.mmd
 
 # draw.ioの2ページ目を幅1600pxのPNGへ。縦横比は維持する。
 ./scripts/render-diagram.sh --page 2 --png-width 1600 samples/diagram-gallery.drawio
