@@ -17,21 +17,12 @@ section {
   --marpit-root-font-size: 87px;
   /* 左帯の幅 (3x キャンバス基準、視覚 約29px)。コンテンツ領域は padding-left: 270px で帯と重ならない。 */
   --rail-width: 88px;
-  /* コードブロックのシャドウ。 */
-  --card-shadow:
-    0 1px 1px hsl(225 28% 18% / 0.05),
-    0 3px 6px -2px hsl(225 30% 24% / 0.07),
-    0 10px 18px -6px hsl(225 34% 34% / 0.075),
-    0 28px 48px -18px hsl(225 52% 42% / 0.10);
   /* コードブロックのシャドウ (ベタ・オフセット)。
      blur 0 で --ink 単色を右下にずらすことで、紙が奥に重なったような表現にする。 */
   --card-flat-shadow:
     12px 6px 0 0 var(--ink);
 
   /* --- 背景定数 --- */
-  /* グリッド線の色。不透明な固定色を使うことで、2 層のグラデーションが交差点で重なっても
-     色が濃くなる問題を回避している。 */
-  --grid-line: rgb(240, 240, 240);
   /* 方眼・帯・影・区切り線の背景 PNG (Firefox レンダリング)。
      section / section.cover / section.section で共有する。 */
   --paper-bg: url('themes/background.png');
@@ -42,7 +33,6 @@ section {
   --accent: #d2493a;
   --link: #4a7a96;
   --decoration-shadow: drop-shadow(12px 10px 2px rgba(0, 0, 0, 0.09));
-  --rail-divider: rgba(24, 20, 16, 0.45);
   /* コードブロックの枠・影に使う「インク」色。ベタ・オフセットデザインで枠と影を同色にする。 */
   --ink: var(--text);
 
@@ -60,7 +50,7 @@ section {
    すべてのスライドのフォントを GenEi M Gothic v2 に設定する。
    フォールバックには Noto Sans CJK JP (コンテナにインストール済み) を指定する。 */
 
-/* GenEi M Gothic v2 の実ウェイトをコンテナ内にインストールする。
+/* コンテナ内にインストールされた GenEi M Gothic v2 の実ウェイトを参照する。
    engine.mjs がフォントを HTML に埋め込む。 */
 @font-face {
   font-family: "GenEi M Gothic v2";
@@ -209,7 +199,7 @@ section h6 {
   font-size: 1.15em;
 }
 
-/* 太字: 色で区別し、font-weight は通常に戻す。 */
+/* 太字: アクセント色と Medium（500）で強調する。 */
 section strong {
   color: var(--accent);
   font-weight: 500;
