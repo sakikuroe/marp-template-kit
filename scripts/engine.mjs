@@ -204,7 +204,8 @@ const CODE_TOOLBAR_SCRIPT = `<script>
 // Marp のコアクラスを継承し、コードブロックのレンダラーを上書きする。
 class MarpWithMermaid extends Marp {
   constructor(opts) {
-    super(opts);
+    // 通常の絵文字は文字として描画し、Twemojiの外部CDNに依存しない。
+    super({ ...opts, emoji: { shortcode: true, unicode: true, ...opts.emoji } });
     const md = this.markdown;
 
     // ローカル画像を base64 data URI に変換する core rule。

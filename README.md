@@ -19,7 +19,7 @@ Marp を使ったスライド作成のためのテンプレートです。
 │   ├── container.sh      # 共通のイメージ管理
 │   └── engine.mjs        # Marpのカスタムエンジン
 ├── config/               # Mermaidの描画・ブラウザ設定
-├── samples/              # 各種サンプルスライド
+├── samples/              # サンプルスライド・図
 │   ├── components.md     # 使用できるコンポーネント一覧
 │   ├── release-process.mmd # 架空の段階的リリース手順
 │   ├── diagram-gallery.drawio # 計画・業務・設計・画面・リリース手順の22ページ
@@ -28,12 +28,13 @@ Marp を使ったスライド作成のためのテンプレートです。
 ├── themes/
 │   └── modern.css        # カスタムテーマ CSS
 ├── icons/                # ステータスアイコン (SVG)
-└── out/                  # 出力先 (scripts/build.sh が自動生成)
+└── out/                  # スライドと図の出力先
 ```
 
 ## VS Code プレビュー
 
-`.vscode/settings.json` にテーマが登録済みです。VS Code でこのフォルダを開き、`samples/components.md` や `samples/morning.md` の Marp プレビュー (`Ctrl+Shift+V`) を起動するとカスタムフォントが適用されます。
+初回は`./scripts/build.sh samples/components.md`を実行してください。Podman内のフォントから、VS Code用のフォントとテーマを`.cache/`に生成します。
+`.vscode/settings.json`にはこのテーマが登録済みです。生成後、`samples/components.md`や`samples/morning.md`のMarpプレビュー（`Ctrl+Shift+V`）で同じフォントを使用できます。
 
 新しい Markdown ファイルで同じテーマを使う場合は、フロントマターに以下を追加してください。
 
@@ -158,7 +159,7 @@ VS Codeのdraw.io拡張ではページを切り替えて編集できます。
 ./scripts/render-diagram.sh --page 22 samples/diagram-gallery.drawio
 ```
 
-白い図形、黒い線、控えめな角丸と影、源暎エムゴ500／700を共通にしています。
+白を基調にした図形、黒い線、控えめな角丸と影、源暎エムゴ500／700を共通にしています。注意が必要な状態には低彩度の色を使い、同じ役割の要素は形と装飾を揃えています。
 出力範囲と配置は各図の用途に合わせて決まります。単体で共有しても対象が分かるように、図名・対象範囲は必要に応じて見出し、中心のテーマ、システム境界などに記します。
 凡例・基準日・制約・判断条件は残し、関連線、該当作業、画面の外側など、読み手が必要とする場所に置きます。全図に同じ見出し・補足見出し・フッターの配置を当てはめることはしません。
 大きい囲み枠とER図のカードは固定の角丸にし、図形が大きくても角丸を大きくしません。
@@ -177,7 +178,7 @@ ER図・シーケンス図・原因分析では、[draw.ioの多重度の記法]
 ### 図の画質・サイズ・共有方法を指定する
 
 PNGは可逆圧縮のためJPEGのような品質値は設けず、描画倍率で精細さを調整します。
-標準は2倍です。`--scale 3`なら、同じ配置のまま縦横の画素数を約3倍にします。
+標準は2倍です。`--scale 3`なら、同じ配置のままSVGの自然寸法に対して縦横を約3倍の画素数で描画します。
 固定の横幅が必要なら`--png-width 1600`のように画素数を指定できます。縦横比は維持します。
 倍率と固定幅はどちらか一方を指定します。SVGはベクター形式なので、このPNGの設定には影響されません。
 
@@ -200,7 +201,7 @@ PNGは可逆圧縮のためJPEGのような品質値は設けず、描画倍率�
 ./scripts/render-diagram.sh --format png --scale 3 --background white --force samples/release-process.mmd
 
 # 半透明の背景を指定する。SVG・PNGとも透明度を維持する。
-./scripts/render-diagram.sh --background 'rgba(240,245,250,0.5)' --output /tmp/diagram-preview samples/release-process.mmd
+./scripts/render-diagram.sh --background 'rgba(240,245,250,0.5)' --output out/previews/diagram-preview samples/release-process.mmd
 
 # draw.ioの2ページ目を幅1600pxのPNGへ。縦横比は維持する。
 ./scripts/render-diagram.sh --page 2 --png-width 1600 samples/diagram-gallery.drawio
@@ -223,6 +224,7 @@ CIの実行環境は毎回新しいため、イメージは各実行の初回に
 
 - コンテナイメージの初回構築には、依存関係とフォントを取得するためネットワーク接続が必要です。
 - フォントは生成 HTML に埋め込まれるため、閲覧時に外部から取得する必要はありません。
+- 通常の絵文字は文字として描画し、外部CDNから画像を取得しません。HTMLでの絵文字の字形は閲覧環境によって変わります。
 - ベースイメージはdigest、Chrome for Testing・Pythonの直接依存はバージョンを固定しています。Chromeと取得するフォントはチェックサムも検証します。更新時は `Containerfile` の対応する値を変更してください。
 - OSパッケージと推移的依存は完全には固定していないため、再ビルドがバイト単位で同一になる保証はありません。
 - git clone で取得した場合、実行権限はすでに付与されています。別の方法で取得した場合は `chmod +x scripts/build.sh` を実行してください。
