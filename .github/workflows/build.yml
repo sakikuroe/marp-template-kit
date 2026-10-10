@@ -21,7 +21,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Check shell syntax and help
         run: |
-          bash -n scripts/*.sh
+          for script in scripts/*.sh; do
+            bash -n "$script"
+          done
           ./scripts/build.sh --help
           ./scripts/serve.sh --help
           ./scripts/render-diagram.sh --help
@@ -39,6 +41,22 @@ jobs:
             echo 'Diagram rendering failed.' >&2
             exit 1
           fi
+      - name: Verify PDF paths with special characters
+        run: |
+          fixture='filename # [1]'
+          printf '%s\n' '---' 'marp: true' 'theme: modern' '---' '# ファイル名の検証' > ".cache/$fixture.md"
+          ./scripts/build.sh ".cache/$fixture.md"
+          pdftotext "out/pdfs/$fixture.pdf" "$RUNNER_TEMP/pdf-path.txt"
+          grep -F 'ファイル名の検証' "$RUNNER_TEMP/pdf-path.txt"
+          pdf_before="$(sha256sum "out/pdfs/$fixture.pdf")"
+          printf '%s\n' '---' 'marp: true' 'theme: modern' '---' '```mermaid' 'not a diagram' '```' > ".cache/$fixture.md"
+          if ./scripts/build.sh ".cache/$fixture.md"; then
+            echo 'Invalid Mermaid unexpectedly succeeded.' >&2
+            exit 1
+          fi
+          test "$(sha256sum "out/pdfs/$fixture.pdf")" = "$pdf_before"
+          rm -f ".cache/$fixture.md" ".cache/$fixture.001.png" \
+            "out/htmls/$fixture.html" "out/pdfs/$fixture.pdf" "out/png_pdfs/$fixture.pdf"
       - name: Render standalone diagrams
         run: |
           ./scripts/render-diagram.sh samples/release-process.mmd
@@ -52,7 +70,8 @@ jobs:
           from PIL import Image
           image = Image.open("/check/release-process.png")
           assert image.width == 701
-          pixel = image.convert("RGBA").getpixel((0, 0))
+          # 外周のアンチエイリアスを避け、余白内の背景色を検査する。
+          pixel = image.convert("RGBA").getpixel((2, 2))
           assert all(abs(a-b) <= 1 for a,b in zip(pixel, (20,80,160,64))), pixel
           svg = open("/check/release-process.svg").read()
           assert "@font-face" not in svg and "data:font" not in svg

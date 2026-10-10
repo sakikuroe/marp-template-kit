@@ -6,6 +6,15 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$script_dir/scripts/container.sh"
 parse_slide_options "$@"
 
+# エンジンがプレビュー用のエラー表示を返しても、ビルドでは失敗として扱う。
+report_marp_output() {
+  printf '%s\n' "$1" | grep -Ev '\[  WARN \] Insecure local file|^ +\S+\.md$' >&2 || true
+  if [[ "$1" =~ (^|$'\n')\[(mermaid|matplotlib)\] ]]; then
+    echo 'error: スライド内の図を描画できませんでした。' >&2
+    return 1
+  fi
+}
+
 rel_input="$(markdown_path "$script_dir" "$input")"
 base="$(basename -- "${input%.*}")"
 input_dir="$(dirname "$rel_input")"
@@ -20,10 +29,11 @@ mkdir -p "$script_dir/.cache"
 
 # VS Code 用にフォントを取り出し、相対パスで参照するCSSとプレビュー用テーマを生成する。
 # フォントの取得元はコンテナ内に統一し、生成物は Git 管理外の .cache に置く。
-podman run --rm --userns=keep-id --network=none \
+html_url=$(podman run --rm --userns=keep-id --network=none \
   -v "$script_dir:/app" --entrypoint node "$image" -e '
     const fs = require("node:fs");
     const path = require("node:path");
+    const { pathToFileURL } = require("node:url");
     const fontDir = "/app/.cache/fonts";
     fs.mkdirSync(fontDir, { recursive: true });
     const mime = { ".ttf": "font/ttf", ".otf": "font/otf", ".png": "image/png" };
@@ -53,7 +63,9 @@ podman run --rm --userns=keep-id --network=none \
       }
     );
     fs.writeFileSync("/app/.cache/modern-preview.css", css);
-  '
+    // #や%を含む名前も、ChromeへファイルURLとして正しく渡す。
+    process.stdout.write(pathToFileURL(process.argv[1]).href);
+  ' "/app/out/htmls/${base}.html")
 
 # HTML を生成する。
 _out=$(podman run --rm --init \
@@ -71,11 +83,14 @@ _out=$(podman run --rm --init \
   --engine /app/scripts/engine.mjs \
   -o "out/htmls/${base}.html" \
   --allow-local-files 2>&1) || { rc=$?; printf '%s\n' "$_out" >&2; exit "$rc"; }
-printf '%s\n' "$_out" | grep -Ev '\[  WARN \] Insecure local file|^ +\S+\.md$' >&2 || true
+report_marp_output "$_out"
 
 # .pdf を生成する。
 # --headless=new: Chrome 112+ 新ヘッドレスモード (印刷品質が旧より高い)。
 # HTML は自己完結しているため --allow-file-access-from-files は不要。
+# Chromeは読み込み失敗でも成功終了することがあるため、一時PDFの生成を確認する。
+pdf_tmp="$(mktemp "$script_dir/out/pdfs/.pdf.XXXXXX")"
+trap 'rm -f -- "$pdf_tmp"' EXIT
 podman run --rm --init \
   --userns=keep-id \
   --network=host \
@@ -88,8 +103,13 @@ podman run --rm --init \
   --disable-setuid-sandbox \
   --disable-dev-shm-usage \
   --no-pdf-header-footer \
-  --print-to-pdf="/app/out/pdfs/${base}.pdf" \
-  "file:///app/out/htmls/${base}.html"
+  --print-to-pdf="/app/out/pdfs/$(basename -- "$pdf_tmp")" \
+  "$html_url"
+if [ ! -s "$pdf_tmp" ]; then
+  echo 'error: PDFが生成されませんでした。' >&2
+  exit 1
+fi
+mv -- "$pdf_tmp" "$script_dir/out/pdfs/${base}.pdf"
 
 # _png.pdf を生成する (PNG 経由)。
 # backdrop-filter が Chromium の PDF エクスポートパイプラインで描画されないため PNG 経由で変換する
@@ -112,7 +132,7 @@ _out=$(podman run --rm --init \
   --images png \
   -o ".cache/${base}.png" \
   --allow-local-files 2>&1) || { rc=$?; printf '%s\n' "$_out" >&2; exit "$rc"; }
-printf '%s\n' "$_out" | grep -Ev '\[  WARN \] Insecure local file|^ +\S+\.md$' >&2 || true
+report_marp_output "$_out"
 
 # ファイル名を行や正規表現として解釈せず、数値順でimg2pdfへ渡す。
 # 空白や角括弧を含む名前でも、パス変換とページ順が壊れないようにする。
