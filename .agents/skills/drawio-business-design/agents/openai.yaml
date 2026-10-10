@@ -1,0 +1,4 @@
+interface:
+  display_name: "draw.io 業務図のデザイン"
+  short_description: "業務図の配色・書体・角丸・影を揃え、余白と可読性を描画して確認する"
+  default_prompt: "$drawio-business-design を使い、内容に合った構図を選び、共通の見た目と読みやすい余白を持つdraw.io図に整えてください。"
