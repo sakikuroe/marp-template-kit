@@ -800,6 +800,10 @@
 </root></mxGraphModel></diagram>
 <diagram id="gantt" name="ガントチャート"><mxGraphModel dx="1800" dy="1200" grid="1" gridSize="10" page="0" math="0" shadow="0">
       <root>
+        <!-- Progress fills have 2px vertical gaps in the rendered SVG.
+             The 1.2px frames receive translate(0.5,0.5); their unstroked fills
+             include that offset in x/y. The 1.8px attention frame has no offset.
+             If stroke widths change, compare rendered coordinates before adjusting fills. -->
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="c1" value="貸出予約・導入計画（案）" style="text;html=0;whiteSpace=wrap;overflow=visible;align=left;verticalAlign=middle;spacing=0;strokeColor=none;fillColor=none;fontFamily=GenEi M Gothic v2;fontStyle=1;fontSize=30;fontColor=#171717;" vertex="1" parent="1">
