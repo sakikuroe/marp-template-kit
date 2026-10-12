@@ -63,7 +63,7 @@ section { --body-scale: 0.9; }
 
 ## 見出しのレベル
 
-`#` (h1) はセクションスライドの章番号に使います。`##` (h2) はスライドタイトルで, このスライドの「見出しのレベル」がその例です。コンテンツ内の小見出しには `###` 以降を使います。
+`#` (h1) はセクションスライドの章番号に使います。`##` (h2) はスライドタイトルで、このスライドの「見出しのレベル」がその例です。コンテンツ内の小見出しには `###` 以降を使います。
 
 ### h3: 小見出し
 
@@ -173,7 +173,7 @@ TPO に合わせて、適切に使用することが重要です。
 
 `![w:Npx](path)` の形式で幅を指定して画像を挿入します（`w` は `width` の短縮形）。
 
-![w:900px](assets/mandelbrot.png)
+![w:900px](../assets/mandelbrot.png)
 *Mandelbrot set*
 
 ---
@@ -655,7 +655,7 @@ $f(x) = x^2 - 2$ は $[0,\,2]$ 上で連続で $f(0) = -2 < 0$、$f(2) = 2 > 0$ 
 section { --body-scale: 0.8; }
 </style>
 
-`.cols` はテキスト・画像・カードを問わず, 横並びに配置する汎用グリッドです。
+`.cols` はテキスト・画像・カードを問わず、横並びに配置する汎用グリッドです。
 
 <div class="cols">
 <div>
@@ -691,7 +691,7 @@ section .cols img { max-height: 900px; width: auto; }
 <div class="cols">
 <div>
 
-![](assets/mandelbrot.png)
+![](../assets/mandelbrot.png)
 
 </div>
 <div>
@@ -712,7 +712,7 @@ section .cols img { max-height: 900px; width: auto; }
 section { --body-scale: 0.72; }
 </style>
 
-子要素に `.card` クラスを付けると, 先頭の段落が見出しとして強調され, 下線で本文と区切られます. `--card-accent` で下線の色を変えられます.
+子要素に `.card` クラスを付けると、先頭の段落が見出しとして強調され、下線で本文と区切られます。`--card-accent` で下線の色を変えられます。
 
 <div class="cols">
 <div class="card">
@@ -786,7 +786,7 @@ section { --body-scale: 0.8; }
 .card:last-child { --card-accent: var(--accent); }
 </style>
 
-子要素に `.card` クラスを付けると, 先頭の段落が見出しとして強調され, 下線で本文と区切られます. `--card-accent` で下線の色を変えられます.
+子要素に `.card` クラスを付けると、先頭の段落が見出しとして強調され、下線で本文と区切られます。`--card-accent` で下線の色を変えられます。
 
 <div class="cols">
 <div class="card">
@@ -823,8 +823,8 @@ section { --body-scale: 0.8; }
 
 ## 参考文献
 
-- 著者名, 「タイトル」, 出版社, 年.
-- 著者名, 「タイトル」, 学会誌名, vol. X, no. Y, pp. Z–ZZ, 年.
+- 著者名、「タイトル」、出版社、年。
+- 著者名、「タイトル」、学会誌名、vol. X、no. Y、pp. Z–ZZ、年。
 - 著者名, "Title," *Journal Name*, vol. X, no. Y, pp. Z–ZZ, Year.
 
 ---

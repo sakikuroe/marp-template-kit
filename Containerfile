@@ -59,4 +59,13 @@ RUN set -eu; \
     rm /tmp/genei-m-gothic.zip; \
     fc-cache -f
 
+# draw.io Desktopは独立した変換コマンドとして使う。公式パッケージのライセンス情報も保持する。
+ARG DRAWIO_VERSION=32.3.0
+RUN wget -q -O /tmp/drawio.deb "https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-amd64-${DRAWIO_VERSION}.deb" && \
+    echo "ef60ee194d8b45990dfaef2541cce8792c81d4df4cd17c7ccdcc3c3f8b3a1754  /tmp/drawio.deb" | sha256sum -c - && \
+    apt-get update && \
+    apt-get install -y xvfb xauth /tmp/drawio.deb && \
+    rm /tmp/drawio.deb && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
